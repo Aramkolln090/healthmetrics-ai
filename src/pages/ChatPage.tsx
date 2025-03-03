@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { AIInputWithSuggestions } from "@/components/ui/ai-input-with-suggestions";
-import { Navbar } from "@/components/layout/Navbar";
-import { Heart, Brain, Activity, Pulse } from "lucide-react";
+import Navbar from "@/components/layout/Navbar";
+import { Heart, Brain, Activity, FileHeart } from "lucide-react";
 
 // Message types
 interface Message {
@@ -44,7 +44,7 @@ const HEALTH_ACTIONS = [
   },
   {
     text: "Medical Info",
-    icon: Pulse,
+    icon: FileHeart,
     colors: {
       icon: "text-purple-600",
       border: "border-purple-500",
@@ -148,7 +148,10 @@ const ChatPage: React.FC = () => {
       
       {/* Background effect */}
       <div className="fixed inset-0 -z-10">
-        <AuroraBackground showRadialGradient={true} />
+        <AuroraBackground showRadialGradient={true}>
+          {/* Empty div to satisfy children prop requirement */}
+          <div></div>
+        </AuroraBackground>
       </div>
     </div>
   );
