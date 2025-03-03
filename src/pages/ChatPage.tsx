@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { AIInputWithSuggestions } from "@/components/ui/ai-input-with-suggestions";
 import Navbar from "@/components/layout/Navbar";
-import { Heart, Brain, Activity, FileHeart } from "lucide-react";
+import { Heart, Brain, Activity, FileHeart, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Message types
 interface Message {
@@ -53,6 +54,15 @@ const HEALTH_ACTIONS = [
   },
 ];
 
+// Recommended questions
+const RECOMMENDED_QUESTIONS = [
+  "What are the best exercises for heart health?",
+  "How can I improve my sleep quality?",
+  "What foods should I eat to boost my immunity?",
+  "How do I manage stress effectively?",
+  "What are common symptoms of vitamin deficiency?"
+];
+
 // Sample AI responses for demo purposes
 const AI_RESPONSES: Record<string, string> = {
   default: "I'm your health AI assistant. How can I help you with your health today?",
@@ -96,11 +106,15 @@ const ChatPage: React.FC = () => {
     }, 1000);
   };
 
+  const handleQuestionClick = (question: string) => {
+    handleSubmit(question);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <div className="flex-1 pt-20">
+      <div className="flex-1 pt-20 pb-20 relative">
         {/* Chat container */}
         <div className="container mx-auto px-4 max-w-4xl h-full flex flex-col">
           <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-lg shadow-xl flex-1 p-6 mb-6 overflow-hidden flex flex-col">
@@ -132,17 +146,39 @@ const ChatPage: React.FC = () => {
                 </div>
               ))}
             </div>
-            
-            {/* Input area */}
-            <div className="mt-auto">
-              <AIInputWithSuggestions 
-                placeholder="Ask me anything about your health..."
-                onSubmit={handleSubmit}
-                actions={HEALTH_ACTIONS}
-                maxHeight={200}
-              />
-            </div>
+
+            {/* Recommended questions (only show if no messages from user yet) */}
+            {messages.length === 1 && (
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-muted-foreground mb-3">Try asking:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {RECOMMENDED_QUESTIONS.map((question, index) => (
+                    <Button 
+                      key={index} 
+                      variant="outline" 
+                      size="sm" 
+                      className="rounded-full text-xs"
+                      onClick={() => handleQuestionClick(question)}
+                    >
+                      {question}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
+        </div>
+      </div>
+      
+      {/* Fixed input area at bottom */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border z-10">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <AIInputWithSuggestions 
+            placeholder="Ask me anything about your health..."
+            onSubmit={handleSubmit}
+            actions={HEALTH_ACTIONS}
+            maxHeight={200}
+          />
         </div>
       </div>
       

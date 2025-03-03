@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { TextHoverEffect } from "@/components/ui/text-hover-effect";
 import { ArrowRight } from "lucide-react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -52,9 +53,12 @@ const HeroSection = () => {
             <Button
               size="lg"
               className="rounded-full px-8 py-6 text-base shadow-md hover:shadow-lg transition-all duration-300"
+              asChild
             >
-              Get Started
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <Link to="/chat">
+                Get Started
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
             <Button
               variant="outline"
