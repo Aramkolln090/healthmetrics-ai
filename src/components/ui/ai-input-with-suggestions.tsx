@@ -67,7 +67,7 @@ const DEFAULT_ACTIONS: ActionItem[] = [
 export function AIInputWithSuggestions({
     id = "ai-input-with-actions",
     placeholder = "Enter your text here...",
-    minHeight = 40,
+    minHeight = 64,
     maxHeight = 200,
     actions = DEFAULT_ACTIONS,
     defaultSelected,
@@ -100,9 +100,9 @@ export function AIInputWithSuggestions({
     };
 
     return (
-        <div className={cn("w-full", className)}>
-            <div className="relative w-full mx-auto">
-                <div className="relative focus-within:border-black/20 dark:focus-within:border-white/20 rounded-full">
+        <div className={cn("w-full py-4", className)}>
+            <div className="relative max-w-xl w-full mx-auto">
+                <div className="relative border border-black/10 dark:border-white/10 focus-within:border-black/20 dark:focus-within:border-white/20 rounded-2xl bg-black/[0.03] dark:bg-white/[0.03]">
                     <div className="flex flex-col">
                         <div
                             className="overflow-y-auto"
@@ -113,7 +113,7 @@ export function AIInputWithSuggestions({
                                 id={id}
                                 placeholder={placeholder}
                                 className={cn(
-                                    "w-full pr-10 py-2 placeholder:text-black/60 dark:placeholder:text-white/60 border-none text-black dark:text-white resize-none text-wrap bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 leading-[1.2] rounded-full",
+                                    "max-w-xl w-full rounded-2xl pr-10 pt-3 pb-3 placeholder:text-black/70 dark:placeholder:text-white/70 border-none focus:ring text-black dark:text-white resize-none text-wrap bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 leading-[1.2]",
                                     `min-h-[${minHeight}px]`
                                 )}
                                 value={inputValue}
@@ -130,7 +130,7 @@ export function AIInputWithSuggestions({
                             />
                         </div>
 
-                        <div className="h-0 bg-transparent">
+                        <div className="h-12 bg-transparent">
                             {currentItem && (
                                 <div className="absolute left-3 bottom-3 z-10">
                                     <button
@@ -165,11 +165,10 @@ export function AIInputWithSuggestions({
                                 ? "opacity-100 scale-100"
                                 : "opacity-30 scale-95"
                         )}
-                        onClick={handleSubmit}
                     />
                 </div>
             </div>
-            <div className="flex flex-wrap gap-1.5 mt-2 max-w-xl mx-auto justify-center px-4">
+            <div className="flex flex-wrap gap-1.5 mt-2 max-w-xl mx-auto justify-start px-4">
                 {actions.filter((item) => item.text !== selectedItem).map(
                     ({ text, icon: Icon, colors }) => (
                         <button
