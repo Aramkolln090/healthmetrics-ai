@@ -1,6 +1,35 @@
 
 import type { Config } from "tailwindcss";
 
+const flattenColorPalette = (obj: Record<string, any>) => {
+  const flattened: Record<string, string> = {};
+  Object.entries(obj).forEach(([key, val]) => {
+    if (typeof val === 'string') {
+      flattened[key] = val;
+    } else {
+      Object.entries(val as Record<string, string>).forEach(([childKey, childVal]) => {
+        if (childKey === 'DEFAULT') {
+          flattened[key] = childVal;
+        } else {
+          flattened[`${key}-${childKey}`] = childVal;
+        }
+      });
+    }
+  });
+  return flattened;
+};
+
+const addVariablesForColors = ({ addBase, theme }: any) => {
+  let allColors = flattenColorPalette(theme('colors'));
+  let newVars = Object.fromEntries(
+    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+  );
+
+  addBase({
+    ':root': newVars,
+  });
+};
+
 export default {
 	darkMode: ["class"],
 	content: [
@@ -143,6 +172,14 @@ export default {
 					'0%': { filter: 'blur(5px)', opacity: '0' },
 					'100%': { filter: 'blur(0)', opacity: '1' }
 				},
+				aurora: {
+					from: {
+						backgroundPosition: '50% 50%, 50% 50%',
+					},
+					to: {
+						backgroundPosition: '350% 50%, 350% 50%',
+					},
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -157,8 +194,9 @@ export default {
 				'scale-in': 'scale-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
 				'scale-out': 'scale-out 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
 				'blur-in': 'blur-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+				'aurora': 'aurora 60s linear infinite',
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [require("tailwindcss-animate"), addVariablesForColors],
 } satisfies Config;
