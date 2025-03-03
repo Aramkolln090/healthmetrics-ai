@@ -44,13 +44,15 @@ const Navbar = () => {
           <NavLink href="#features">Features</NavLink>
           <NavLink href="#metrics">Metrics</NavLink>
           <NavLink href="#ai-assistant">AI Assistant</NavLink>
-          <Button
-            variant="default"
-            size="sm"
-            className="ml-4 rounded-full px-6 transition-all duration-300 bg-primary hover:bg-primary/90"
-          >
-            Get Started
-          </Button>
+          <Link to="/chat">
+            <Button
+              variant="default"
+              size="sm"
+              className="ml-4 rounded-full px-6 transition-all duration-300 bg-primary hover:bg-primary/90"
+            >
+              Get Started
+            </Button>
+          </Link>
         </nav>
 
         {/* Mobile menu button */}
@@ -94,14 +96,15 @@ const Navbar = () => {
             AI Assistant
           </MobileNavLink>
           <div className="pt-4">
-            <Button
-              variant="default"
-              size="lg"
-              className="w-full rounded-full"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Get Started
-            </Button>
+            <Link to="/chat" onClick={() => setIsMobileMenuOpen(false)}>
+              <Button
+                variant="default"
+                size="lg"
+                className="w-full rounded-full"
+              >
+                Get Started
+              </Button>
+            </Link>
           </div>
         </nav>
       </div>
