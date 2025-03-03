@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { AIInputWithSuggestions } from "@/components/ui/ai-input-with-suggestions";
 import Navbar from "@/components/layout/Navbar";
-import { Heart, Brain, Activity, FileHeart, ArrowRight } from "lucide-react";
+import { Heart, Brain, Activity, FileHeart, ArrowRight, Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Message types
@@ -117,7 +117,7 @@ const ChatPage: React.FC = () => {
       <div className="flex-1 pt-20 pb-20 relative">
         {/* Chat container */}
         <div className="container mx-auto px-4 max-w-4xl h-full flex flex-col">
-          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-lg shadow-xl flex-1 p-6 mb-6 overflow-hidden flex flex-col">
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-xl flex-1 p-6 mb-6 overflow-hidden flex flex-col">
             {/* Chat header */}
             <div className="border-b pb-4 mb-6">
               <h1 className="text-2xl font-bold text-primary">HealthyAI Chat</h1>
@@ -132,7 +132,7 @@ const ChatPage: React.FC = () => {
                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div 
-                    className={`max-w-[80%] rounded-lg p-4 ${
+                    className={`max-w-[80%] rounded-2xl p-4 ${
                       message.sender === 'user' 
                         ? 'bg-primary text-primary-foreground' 
                         : 'bg-secondary text-secondary-foreground'
@@ -170,15 +170,47 @@ const ChatPage: React.FC = () => {
         </div>
       </div>
       
-      {/* Fixed input area at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border z-10">
+      {/* Fixed input area at bottom - updated for modern, curved look */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border z-10 pb-4 pt-2">
         <div className="container mx-auto px-4 max-w-4xl">
-          <AIInputWithSuggestions 
-            placeholder="Ask me anything about your health..."
-            onSubmit={handleSubmit}
-            actions={HEALTH_ACTIONS}
-            maxHeight={200}
-          />
+          <div className="bg-white dark:bg-gray-900 rounded-full shadow-md border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center px-4 py-1">
+              <Button 
+                size="icon" 
+                variant="ghost" 
+                className="rounded-full h-9 w-9 flex items-center justify-center"
+              >
+                <Plus className="h-5 w-5 text-muted-foreground" />
+              </Button>
+              
+              <div className="flex-1 mx-2">
+                <AIInputWithSuggestions 
+                  placeholder="Ask me anything about your health..."
+                  onSubmit={handleSubmit}
+                  actions={HEALTH_ACTIONS}
+                  maxHeight={200}
+                  className="py-2"
+                />
+              </div>
+              
+              <div className="flex space-x-1">
+                <Button 
+                  size="icon" 
+                  variant="ghost" 
+                  className="rounded-full h-9 w-9 flex items-center justify-center"
+                >
+                  <Search className="h-5 w-5 text-muted-foreground" />
+                </Button>
+                <div className="bg-black dark:bg-white rounded-full h-9 w-9 flex items-center justify-center">
+                  <div className="h-5 w-5 flex items-center justify-center">
+                    <span className="block w-0.5 h-2 bg-white dark:bg-black mr-0.5"></span>
+                    <span className="block w-0.5 h-3 bg-white dark:bg-black"></span>
+                    <span className="block w-0.5 h-2 bg-white dark:bg-black ml-0.5"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       
