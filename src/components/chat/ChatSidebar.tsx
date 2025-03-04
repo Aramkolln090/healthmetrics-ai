@@ -11,6 +11,8 @@ import {
   Search, 
   Settings, 
   User, 
+  ChevronLeft, 
+  ChevronRight,
   Heart
 } from "lucide-react";
 
@@ -28,12 +30,6 @@ const contentVariants = {
 const iconVariants = {
   open: { x: 0 },
   closed: { x: 0 },
-};
-
-const transitionProps = {
-  type: "tween",
-  ease: "easeOut",
-  duration: 0.2,
 };
 
 // Sample chat history for demo purposes
@@ -59,16 +55,31 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ onNewChat, onChatSelect }) =>
     onChatSelect(chatId);
   };
 
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
   return (
     <motion.div
       className="relative z-30 h-full flex-shrink-0 border-r border-border bg-background/80 backdrop-blur-sm dark:bg-gray-900/80"
       initial="open"
       animate={isCollapsed ? "closed" : "open"}
       variants={sidebarVariants}
-      transition={transitionProps}
-      onMouseEnter={() => setIsCollapsed(false)}
-      onMouseLeave={() => setIsCollapsed(true)}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
+      {/* Toggle button */}
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        className="absolute -right-3 top-6 z-40 h-6 w-6 rounded-full border bg-background shadow-md"
+        onClick={toggleSidebar}
+      >
+        {isCollapsed ? 
+          <ChevronRight className="h-3 w-3" /> : 
+          <ChevronLeft className="h-3 w-3" />
+        }
+      </Button>
+
       <div className="flex h-full flex-col">
         {/* Header */}
         <div className="flex items-center p-3">
@@ -85,7 +96,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ onNewChat, onChatSelect }) =>
         {/* New chat button */}
         <div className="px-3 py-2">
           <Button 
-            className="w-full justify-start gap-2 bg-primary/90 hover:bg-primary text-white rounded-lg text-sm" 
+            className="w-full justify-start gap-2" 
             onClick={onNewChat}
           >
             <Plus className="h-4 w-4" />
@@ -105,7 +116,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ onNewChat, onChatSelect }) =>
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <input
                 placeholder="Search chats..."
-                className="w-full rounded-lg border bg-background px-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full rounded-md border bg-background px-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
@@ -120,10 +131,8 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ onNewChat, onChatSelect }) =>
               <button
                 key={chat.id}
                 className={cn(
-                  "flex w-full items-start gap-2 rounded-lg px-3 py-2.5 text-left transition-colors",
-                  activeChat === chat.id 
-                    ? "bg-accent/80 text-accent-foreground" 
-                    : "hover:bg-accent/40"
+                  "flex w-full items-start gap-2 rounded-lg px-2 py-2 text-left hover:bg-accent",
+                  activeChat === chat.id && "bg-accent"
                 )}
                 onClick={() => handleChatClick(chat.id)}
               >
@@ -152,13 +161,13 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({ onNewChat, onChatSelect }) =>
         {/* Footer with settings */}
         <div className="mt-auto border-t p-3">
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-full hover:bg-accent/50">
+            <Button variant="ghost" size="icon" className="rounded-full">
               <Settings className="h-5 w-5" />
             </Button>
             
             {!isCollapsed && (
               <>
-                <Button variant="ghost" size="icon" className="rounded-full hover:bg-accent/50">
+                <Button variant="ghost" size="icon" className="rounded-full">
                   <User className="h-5 w-5" />
                 </Button>
                 <motion.div 
