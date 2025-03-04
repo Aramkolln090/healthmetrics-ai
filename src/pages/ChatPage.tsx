@@ -179,7 +179,12 @@ const ChatPage: React.FC = () => {
                     <h1 className="text-2xl font-bold text-primary">HealthyAI Chat</h1>
                     <p className="text-muted-foreground">Your personal health assistant</p>
                   </div>
-                  <Button variant="outline" size="sm" className="gap-1" onClick={handleNewChat}>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="gap-1 hover:bg-primary/10 rounded-lg" 
+                    onClick={handleNewChat}
+                  >
                     <Plus className="h-3.5 w-3.5" />
                     New Chat
                   </Button>
