@@ -4,6 +4,8 @@ import { AuroraBackground } from "@/components/ui/aurora-background";
 import { AIInputWithSuggestions } from "@/components/ui/ai-input-with-suggestions";
 import Navbar from "@/components/layout/Navbar";
 import { Heart, Brain, Activity, FileHeart } from "lucide-react";
+import { motion } from "framer-motion";
+import { GlowEffect } from "@/components/ui/glow-effect";
 
 // Message types
 interface Message {
@@ -62,6 +64,14 @@ const AI_RESPONSES: Record<string, string> = {
   "Medical Info": "I can provide general information about various health conditions and medications, though this should not replace professional medical advice."
 };
 
+// Suggested questions for users
+const SUGGESTED_QUESTIONS = [
+  "How can I improve my sleep quality?",
+  "What are the benefits of intermittent fasting?",
+  "Can you explain what causes headaches?",
+  "What exercises are best for lower back pain?"
+];
+
 const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -71,6 +81,8 @@ const ChatPage: React.FC = () => {
       timestamp: new Date(),
     },
   ]);
+  
+  const [isGlowing, setIsGlowing] = useState(false);
 
   const handleSubmit = (text: string, action?: string) => {
     // Add user message
@@ -82,6 +94,10 @@ const ChatPage: React.FC = () => {
     };
     
     setMessages((prev) => [...prev, userMessage]);
+    
+    // Trigger glow effect
+    setIsGlowing(true);
+    setTimeout(() => setIsGlowing(false), 2000);
     
     // Simulate AI response
     setTimeout(() => {
@@ -96,6 +112,10 @@ const ChatPage: React.FC = () => {
     }, 1000);
   };
 
+  const handleSuggestedQuestionClick = (question: string) => {
+    handleSubmit(question);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -103,7 +123,7 @@ const ChatPage: React.FC = () => {
       <div className="flex-1 pt-20">
         {/* Chat container */}
         <div className="container mx-auto px-4 max-w-4xl h-full flex flex-col">
-          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-lg shadow-xl flex-1 p-6 mb-6 overflow-hidden flex flex-col">
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-3xl shadow-xl flex-1 p-6 mb-6 overflow-hidden flex flex-col">
             {/* Chat header */}
             <div className="border-b pb-4 mb-6">
               <h1 className="text-2xl font-bold text-primary">HealthyAI Chat</h1>
@@ -118,10 +138,10 @@ const ChatPage: React.FC = () => {
                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div 
-                    className={`max-w-[80%] rounded-lg p-4 ${
+                    className={`max-w-[80%] rounded-2xl p-4 ${
                       message.sender === 'user' 
                         ? 'bg-primary text-primary-foreground' 
-                        : 'bg-secondary text-secondary-foreground'
+                        : 'bg-secondary/80 text-secondary-foreground'
                     }`}
                   >
                     <p>{message.content}</p>
@@ -133,13 +153,50 @@ const ChatPage: React.FC = () => {
               ))}
             </div>
             
-            {/* Input area */}
-            <div className="mt-auto">
+            {/* Suggested questions */}
+            {messages.length <= 2 && (
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-muted-foreground mb-3">Suggested questions:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {SUGGESTED_QUESTIONS.map((question, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSuggestedQuestionClick(question)}
+                      className="px-3 py-2 text-sm bg-secondary/50 hover:bg-secondary/70 text-secondary-foreground rounded-full transition-colors"
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Input area with glow effect */}
+            <div className="mt-auto relative">
+              <motion.div
+                className="relative"
+                animate={{
+                  opacity: isGlowing ? 1 : 0,
+                }}
+                transition={{
+                  duration: 0.3,
+                  ease: "easeOut",
+                }}
+              >
+                <GlowEffect
+                  colors={['#0894FF', '#C959DD', '#FF2E54', '#FF9004']}
+                  mode="colorShift"
+                  blur="medium"
+                  scale={1.1}
+                  duration={3}
+                />
+              </motion.div>
               <AIInputWithSuggestions 
                 placeholder="Ask me anything about your health..."
                 onSubmit={handleSubmit}
                 actions={HEALTH_ACTIONS}
                 maxHeight={200}
+                className="relative z-10"
               />
             </div>
           </div>
@@ -149,7 +206,6 @@ const ChatPage: React.FC = () => {
       {/* Background effect */}
       <div className="fixed inset-0 -z-10">
         <AuroraBackground showRadialGradient={true}>
-          {/* Empty div to satisfy children prop requirement */}
           <div></div>
         </AuroraBackground>
       </div>
