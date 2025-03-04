@@ -1,13 +1,16 @@
-
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { MenuIcon, X } from "lucide-react";
+import { MenuIcon, X, LogIn } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,6 +24,14 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleGetStarted = () => {
+    if (user) {
+      navigate('/chat');
+    } else {
+      navigate('/chat');
+    }
+  };
 
   return (
     <header
@@ -44,15 +55,39 @@ const Navbar = () => {
           <NavLink href="#features">Features</NavLink>
           <NavLink href="#metrics">Metrics</NavLink>
           <NavLink href="#ai-assistant">AI Assistant</NavLink>
-          <Link to="/chat">
-            <Button
-              variant="default"
-              size="sm"
-              className="ml-4 rounded-full px-6 transition-all duration-300 bg-primary hover:bg-primary/90"
+
+          {user ? (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="ml-4"
+              onClick={() => signOut()}
             >
-              Get Started
+              Sign Out
             </Button>
-          </Link>
+          ) : (
+            <AuthModal 
+              triggerButton={
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="ml-4"
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign In
+                </Button>
+              }
+            />
+          )}
+
+          <Button
+            variant="default"
+            size="sm"
+            className="rounded-full px-6 transition-all duration-300 bg-primary hover:bg-primary/90"
+            onClick={handleGetStarted}
+          >
+            Get Started
+          </Button>
         </nav>
 
         {/* Mobile menu button */}
@@ -95,16 +130,44 @@ const Navbar = () => {
           >
             AI Assistant
           </MobileNavLink>
+
+          {user ? (
+            <Button 
+              variant="outline"  
+              className="w-full"
+              onClick={() => {
+                signOut();
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              Sign Out
+            </Button>
+          ) : (
+            <AuthModal 
+              triggerButton={
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign In
+                </Button>
+              }
+            />
+          )}
+
           <div className="pt-4">
-            <Link to="/chat" onClick={() => setIsMobileMenuOpen(false)}>
-              <Button
-                variant="default"
-                size="lg"
-                className="w-full rounded-full"
-              >
-                Get Started
-              </Button>
-            </Link>
+            <Button
+              variant="default"
+              size="lg"
+              className="w-full rounded-full"
+              onClick={() => {
+                handleGetStarted();
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              Get Started
+            </Button>
           </div>
         </nav>
       </div>

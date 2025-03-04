@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { AIInputWithSuggestions } from "@/components/ui/ai-input-with-suggestions";
 import Navbar from "@/components/layout/Navbar";
@@ -7,6 +7,8 @@ import { motion } from "framer-motion";
 import { GlowEffect } from "@/components/ui/glow-effect";
 import ChatSidebar from "@/components/chat/ChatSidebar";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { AuthModal } from "@/components/auth/AuthModal";
 
 // Message types
 interface Message {
@@ -14,11 +16,6 @@ interface Message {
   content: string;
   sender: "user" | "ai";
   timestamp: Date;
-}
-interface Chat {
-  id: string;
-  title: string;
-  messages: Message[];
 }
 
 // AI action types for health questions
@@ -67,7 +64,9 @@ const AI_RESPONSES: Record<string, string> = {
 
 // Suggested questions for users
 const SUGGESTED_QUESTIONS = ["How can I improve my sleep quality?", "What are the benefits of intermittent fasting?", "Can you explain what causes headaches?", "What exercises are best for lower back pain?"];
+
 const ChatPage: React.FC = () => {
+  const { user, isLoading } = useAuth();
   const [currentChatId, setCurrentChatId] = useState<string>("default");
   const [chats, setChats] = useState<Record<string, Message[]>>({
     default: [{
@@ -78,6 +77,7 @@ const ChatPage: React.FC = () => {
     }]
   });
   const [isGlowing, setIsGlowing] = useState(false);
+
   const handleSubmit = (text: string, action?: string) => {
     // Add user message
     const userMessage: Message = {
@@ -109,9 +109,11 @@ const ChatPage: React.FC = () => {
       }));
     }, 1000);
   };
+
   const handleSuggestedQuestionClick = (question: string) => {
     handleSubmit(question);
   };
+
   const handleNewChat = () => {
     const newChatId = `chat-${Date.now()}`;
     setChats(prev => ({
@@ -125,10 +127,48 @@ const ChatPage: React.FC = () => {
     }));
     setCurrentChatId(newChatId);
   };
+
   const handleChatSelect = (chatId: number) => {
     // Convert to string for our state structure
     setCurrentChatId(chatId.toString());
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 pt-16 flex items-center justify-center bg-gradient-to-b from-blue-50 to-white">
+          <div className="max-w-md w-full p-8 bg-white rounded-xl shadow-lg">
+            <h1 className="text-2xl font-bold text-center mb-6">Sign In to Use HealthyAI Chat</h1>
+            <p className="text-center text-muted-foreground mb-8">
+              Please sign in or create an account to start chatting with our AI health assistant.
+            </p>
+            <AuthModal 
+              triggerButton={
+                <Button className="w-full" size="lg">
+                  Sign In or Sign Up
+                </Button>
+              }
+            />
+          </div>
+        </div>
+        <div className="fixed inset-0 -z-10">
+          <AuroraBackground showRadialGradient={true}>
+            <div></div>
+          </AuroraBackground>
+        </div>
+      </div>
+    );
+  }
+
   const currentMessages = chats[currentChatId] || [];
   return <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -203,4 +243,5 @@ const ChatPage: React.FC = () => {
       </div>
     </div>;
 };
+
 export default ChatPage;
