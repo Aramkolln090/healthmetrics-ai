@@ -1,5 +1,6 @@
 
 import React, { ReactNode, useEffect } from 'react';
+import { SmoothScrollProvider } from '@/contexts/SmoothScrollContext';
 import { useLocation } from 'react-router-dom';
 
 interface SmoothScrollContainerProps {
@@ -15,9 +16,11 @@ const SmoothScrollContainer: React.FC<SmoothScrollContainerProps> = ({ children 
   }, [location.pathname]);
 
   return (
-    <div className="relative">
-      {children}
-    </div>
+    <SmoothScrollProvider>
+      <div data-scroll-container className="relative">
+        {children}
+      </div>
+    </SmoothScrollProvider>
   );
 };
 
