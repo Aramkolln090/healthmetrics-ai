@@ -19,6 +19,7 @@ import {
   CalendarDays
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ParallaxSection } from "@/components/ui/parallax-section";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -68,16 +69,18 @@ const Index = () => {
       
       {/* Features Section */}
       <section id="features" className="py-24 px-4 relative">
-        <div className="container mx-auto text-center mb-16">
-          <span className="text-sm font-medium text-primary">Features</span>
-          <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
-            Your complete health companion
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Track your vital health metrics and get personalized AI-powered insights,
-            all in one beautifully designed platform.
-          </p>
-        </div>
+        <ParallaxSection speed={0.2} direction="up">
+          <div className="container mx-auto text-center mb-16">
+            <span className="text-sm font-medium text-primary">Features</span>
+            <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
+              Your complete health companion
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Track your vital health metrics and get personalized AI-powered insights,
+              all in one beautifully designed platform.
+            </p>
+          </div>
+        </ParallaxSection>
         
         <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <FeatureCard
@@ -121,22 +124,26 @@ const Index = () => {
       
       {/* Medication Reminders Section */}
       <section id="reminders" className="py-24 px-4 bg-gradient-to-b from-blue-50/50 to-white">
-        <div className="container mx-auto text-center mb-16">
-          <span className="text-sm font-medium text-primary">Reminders</span>
-          <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
-            Stay on top of your health
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Get timely reminders for medications, appointments, and health checks
-            to maintain your wellness routine.
-          </p>
-        </div>
-        
-        <div className="flex min-h-[350px] w-full items-center justify-center">
-          <div className="w-full max-w-3xl">
-            <DisplayCards cards={medicationCards} />
+        <ParallaxSection speed={0.3} direction="up">
+          <div className="container mx-auto text-center mb-16">
+            <span className="text-sm font-medium text-primary">Reminders</span>
+            <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
+              Stay on top of your health
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Get timely reminders for medications, appointments, and health checks
+              to maintain your wellness routine.
+            </p>
           </div>
-        </div>
+        </ParallaxSection>
+        
+        <ParallaxSection speed={0.1} direction="up">
+          <div className="flex min-h-[350px] w-full items-center justify-center">
+            <div className="w-full max-w-3xl">
+              <DisplayCards cards={medicationCards} />
+            </div>
+          </div>
+        </ParallaxSection>
         
         <div className="mt-12 text-center">
           <Button 
@@ -150,18 +157,22 @@ const Index = () => {
       
       {/* Metrics Section */}
       <section id="metrics" className="py-24 px-4 bg-gradient-to-b from-white to-blue-50">
-        <div className="container mx-auto text-center mb-16">
-          <span className="text-sm font-medium text-primary">Metrics</span>
-          <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
-            Track what matters
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Monitor all your vital health metrics in one place with beautiful
-            visualizations and actionable insights.
-          </p>
-        </div>
+        <ParallaxSection speed={0.2} direction="up">
+          <div className="container mx-auto text-center mb-16">
+            <span className="text-sm font-medium text-primary">Metrics</span>
+            <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
+              Track what matters
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Monitor all your vital health metrics in one place with beautiful
+              visualizations and actionable insights.
+            </p>
+          </div>
+        </ParallaxSection>
         
-        <MetricsPreview />
+        <ParallaxSection speed={0.1} direction="up">
+          <MetricsPreview />
+        </ParallaxSection>
         
         <div className="mt-12 text-center">
           <Button 
@@ -175,18 +186,22 @@ const Index = () => {
       
       {/* AI Assistant Section */}
       <section id="ai-assistant" className="py-24 px-4">
-        <div className="container mx-auto text-center mb-16">
-          <span className="text-sm font-medium text-primary">AI Assistant</span>
-          <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
-            Your personal health guide
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Get personalized health recommendations and insights from our
-            AI-powered assistant, trained on the latest medical research.
-          </p>
-        </div>
+        <ParallaxSection speed={0.2} direction="up">
+          <div className="container mx-auto text-center mb-16">
+            <span className="text-sm font-medium text-primary">AI Assistant</span>
+            <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
+              Your personal health guide
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Get personalized health recommendations and insights from our
+              AI-powered assistant, trained on the latest medical research.
+            </p>
+          </div>
+        </ParallaxSection>
         
-        <AIPreview />
+        <ParallaxSection speed={0.1} direction="up">
+          <AIPreview />
+        </ParallaxSection>
         
         <div className="mt-12 text-center">
           <Button 

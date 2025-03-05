@@ -11,6 +11,7 @@ import ChatPage from "./pages/ChatPage";
 import MetricsPage from "./pages/MetricsPage";
 import CalendarPage from "./pages/CalendarPage";
 import NotFound from "./pages/NotFound";
+import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/chat" element={<ChatPage />} />
+              <Route path="/login" element={<LoginPage />} />
               <Route 
                 path="/metrics" 
                 element={

@@ -17,7 +17,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
   
-  // If no user is logged in, redirect to home and show toast
+  // If no user is logged in, redirect to login page and show toast
   if (!user) {
     toast({
       title: "Authentication required",
@@ -25,7 +25,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       variant: "destructive",
     });
     
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
   
   // If user is authenticated, render the children
