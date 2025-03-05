@@ -189,3 +189,14 @@ html {
     background-position: 0% 50%;
   }
 }
+
+/* 3D Perspective Scroll styles */
+.perspective-container {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.perspective-item {
+  transform-style: preserve-3d;
+  will-change: transform;
+}

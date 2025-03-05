@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { TextHoverEffect } from "@/components/ui/text-hover-effect";
 import { ArrowRight } from "lucide-react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
-import { ParallaxSection } from "@/components/ui/parallax-section";
 import { motion } from "framer-motion";
 
 const HeroSection = () => {
@@ -26,7 +25,7 @@ const HeroSection = () => {
   return (
     <AuroraBackground className="min-h-screen w-full">
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden">
-        <ParallaxSection speed={0.2} direction="up" className="z-10">
+        <div className="z-10">
           <div className={`max-w-5xl mx-auto text-center transition-all duration-1000 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
             
             <TextHoverEffect text="HealthyAI" className="pb-4 md:pb-8" />
@@ -50,23 +49,21 @@ const HeroSection = () => {
               </Button>
             </div>
           </div>
-        </ParallaxSection>
+        </div>
 
-        <ParallaxSection speed={0.1} direction="down" className="z-0">
-          <motion.div 
-            className={`absolute bottom-0 left-0 right-0 flex justify-center pb-12 transition-all duration-1000 delay-700 ${isVisible ? "opacity-100" : "opacity-0"}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
-          >
-            <a href="#features" className="flex flex-col items-center justify-center text-sm text-foreground/70 hover:text-foreground transition-colors">
-              <span className="mb-2">Scroll to learn more</span>
-              <div className="w-6 h-10 border-2 border-foreground/50 rounded-full flex justify-center p-1">
-                <div className="w-1 h-1 bg-foreground/70 rounded-full animate-bounce"></div>
-              </div>
-            </a>
-          </motion.div>
-        </ParallaxSection>
+        <motion.div 
+          className={`absolute bottom-0 left-0 right-0 flex justify-center pb-12 transition-all duration-1000 delay-700 ${isVisible ? "opacity-100" : "opacity-0"}`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+          transition={{ delay: 0.7, duration: 0.5 }}
+        >
+          <a href="#features" className="flex flex-col items-center justify-center text-sm text-foreground/70 hover:text-foreground transition-colors">
+            <span className="mb-2">Scroll to learn more</span>
+            <div className="w-6 h-10 border-2 border-foreground/50 rounded-full flex justify-center p-1">
+              <div className="w-1 h-1 bg-foreground/70 rounded-full animate-bounce"></div>
+            </div>
+          </a>
+        </motion.div>
       </section>
     </AuroraBackground>
   );
