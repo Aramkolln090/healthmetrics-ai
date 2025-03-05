@@ -1,5 +1,6 @@
 
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Navbar from "@/components/layout/Navbar";
@@ -63,6 +64,8 @@ const MetricsPage: React.FC = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
@@ -266,7 +269,10 @@ const MetricsPage: React.FC = () => {
                       </Card>
                     ))}
                     
-                    <div className="flex items-center justify-center p-4">
+                    <div 
+                      className="flex items-center justify-center p-4 cursor-pointer hover:bg-muted rounded-lg transition-colors"
+                      onClick={() => navigate('/calendar')}
+                    >
                       <Calendar className="h-5 w-5 mr-2 text-muted-foreground" />
                       <span className="text-muted-foreground">View Full Calendar</span>
                     </div>

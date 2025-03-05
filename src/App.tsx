@@ -9,6 +9,7 @@ import SmoothScrollContainer from "@/components/layout/SmoothScrollContainer";
 import Index from "./pages/Index";
 import ChatPage from "./pages/ChatPage";
 import MetricsPage from "./pages/MetricsPage";
+import CalendarPage from "./pages/CalendarPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/metrics" element={<MetricsPage />} />
+              <Route path="/calendar" element={<CalendarPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
