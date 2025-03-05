@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import SmoothScrollContainer from "@/components/layout/SmoothScrollContainer";
 import Index from "./pages/Index";
 import ChatPage from "./pages/ChatPage";
+import MetricsPage from "./pages/MetricsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/chat" element={<ChatPage />} />
+              <Route path="/metrics" element={<MetricsPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
