@@ -1,24 +1,63 @@
 
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import HeroSection from "@/components/hero/HeroSection";
 import FeatureCard from "@/components/features/FeatureCard";
 import AIPreview from "@/components/ai/AIPreview";
 import MetricsPreview from "@/components/metrics/MetricsPreview";
+import DisplayCards from "@/components/ui/display-cards";
 import { 
   Brain, 
   Activity, 
   Heart, 
   Bell, 
   LineChart, 
-  ShieldCheck
+  ShieldCheck,
+  Pill,
+  Clock,
+  CalendarDays
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
+  const navigate = useNavigate();
+  
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Medication reminder cards
+  const medicationCards = [
+    {
+      icon: <Pill className="size-4 text-red-300" />,
+      title: "Medication Alert",
+      description: "Time to take Lisinopril",
+      date: "Just now",
+      iconClassName: "text-red-500",
+      titleClassName: "text-red-500",
+      className: "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
+    },
+    {
+      icon: <Clock className="size-4 text-blue-300" />,
+      title: "Reminder",
+      description: "Blood Pressure Check Due",
+      date: "30 mins ago",
+      iconClassName: "text-blue-500",
+      titleClassName: "text-blue-500",
+      className: "[grid-area:stack] translate-x-16 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
+    },
+    {
+      icon: <CalendarDays className="size-4 text-green-300" />,
+      title: "Upcoming",
+      description: "Doctor Appointment Tomorrow",
+      date: "Today",
+      iconClassName: "text-green-500",
+      titleClassName: "text-green-500",
+      className: "[grid-area:stack] translate-x-32 translate-y-20 hover:translate-y-10",
+    },
+  ];
 
   return (
     <div className="min-h-screen">
@@ -80,6 +119,35 @@ const Index = () => {
         </div>
       </section>
       
+      {/* Medication Reminders Section */}
+      <section id="reminders" className="py-24 px-4 bg-gradient-to-b from-blue-50/50 to-white">
+        <div className="container mx-auto text-center mb-16">
+          <span className="text-sm font-medium text-primary">Reminders</span>
+          <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
+            Stay on top of your health
+          </h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Get timely reminders for medications, appointments, and health checks
+            to maintain your wellness routine.
+          </p>
+        </div>
+        
+        <div className="flex min-h-[350px] w-full items-center justify-center">
+          <div className="w-full max-w-3xl">
+            <DisplayCards cards={medicationCards} />
+          </div>
+        </div>
+        
+        <div className="mt-12 text-center">
+          <Button 
+            onClick={() => navigate('/metrics')} 
+            className="rounded-full px-8"
+          >
+            View All Reminders
+          </Button>
+        </div>
+      </section>
+      
       {/* Metrics Section */}
       <section id="metrics" className="py-24 px-4 bg-gradient-to-b from-white to-blue-50">
         <div className="container mx-auto text-center mb-16">
@@ -94,6 +162,15 @@ const Index = () => {
         </div>
         
         <MetricsPreview />
+        
+        <div className="mt-12 text-center">
+          <Button 
+            onClick={() => navigate('/metrics')} 
+            className="rounded-full px-8"
+          >
+            View Detailed Metrics
+          </Button>
+        </div>
       </section>
       
       {/* AI Assistant Section */}
@@ -110,6 +187,15 @@ const Index = () => {
         </div>
         
         <AIPreview />
+        
+        <div className="mt-12 text-center">
+          <Button 
+            onClick={() => navigate('/chat')} 
+            className="rounded-full px-8"
+          >
+            Talk to Your AI Assistant
+          </Button>
+        </div>
       </section>
       
       {/* Footer */}

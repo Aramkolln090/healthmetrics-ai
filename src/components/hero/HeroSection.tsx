@@ -1,21 +1,30 @@
+
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { TextHoverEffect } from "@/components/ui/text-hover-effect";
 import { ArrowRight } from "lucide-react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
+
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const navigate = useNavigate();
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 300);
     return () => clearTimeout(timer);
   }, []);
+  
+  const handleGetStarted = () => {
+    navigate('/chat');
+  };
+  
   return <AuroraBackground className="min-h-screen w-full">
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden">
         <div className={`max-w-5xl mx-auto text-center transition-all duration-1000 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           
-
           <TextHoverEffect text="HealthyAI" className="pb-4 md:pb-8" />
 
           <h2 className={`text-xl md:text-2xl text-foreground max-w-2xl mx-auto mb-8 transition-all duration-1000 delay-300 ${isVisible ? "opacity-100" : "opacity-0"}`}>
@@ -24,7 +33,11 @@ const HeroSection = () => {
           </h2>
 
           <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 transition-all duration-1000 delay-500 ${isVisible ? "opacity-100" : "opacity-0"}`}>
-            <Button size="lg" className="rounded-full px-8 py-6 text-base shadow-md hover:shadow-lg transition-all duration-300">
+            <Button 
+              size="lg" 
+              className="rounded-full px-8 py-6 text-base shadow-md hover:shadow-lg transition-all duration-300"
+              onClick={handleGetStarted}
+            >
               Get Started
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -45,4 +58,5 @@ const HeroSection = () => {
       </section>
     </AuroraBackground>;
 };
+
 export default HeroSection;

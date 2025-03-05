@@ -1,16 +1,19 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { MenuIcon, X, LogIn } from "lucide-react";
+import { MenuIcon, X, LogIn, Activity } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { useToast } from "@/hooks/use-toast";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,10 +29,18 @@ const Navbar = () => {
   }, []);
 
   const handleGetStarted = () => {
+    navigate('/chat');
+  };
+  
+  const handleNavigateToMetrics = () => {
     if (user) {
-      navigate('/chat');
+      navigate('/metrics');
     } else {
-      navigate('/chat');
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to view metrics",
+        variant: "destructive",
+      });
     }
   };
 
@@ -53,8 +64,19 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           <NavLink href="#features">Features</NavLink>
+          <NavLink href="#reminders">Reminders</NavLink>
           <NavLink href="#metrics">Metrics</NavLink>
           <NavLink href="#ai-assistant">AI Assistant</NavLink>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-4 gap-2"
+            onClick={handleNavigateToMetrics}
+          >
+            <Activity className="h-4 w-4" />
+            View Metrics
+          </Button>
 
           {user ? (
             <Button 
@@ -119,6 +141,12 @@ const Navbar = () => {
             Features
           </MobileNavLink>
           <MobileNavLink
+            href="#reminders"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Reminders
+          </MobileNavLink>
+          <MobileNavLink
             href="#metrics"
             onClick={() => setIsMobileMenuOpen(false)}
           >
@@ -130,6 +158,18 @@ const Navbar = () => {
           >
             AI Assistant
           </MobileNavLink>
+
+          <Button
+            variant="outline"
+            className="w-full gap-2"
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              handleNavigateToMetrics();
+            }}
+          >
+            <Activity className="h-4 w-4" />
+            View Metrics
+          </Button>
 
           {user ? (
             <Button 

@@ -11,6 +11,7 @@ import ChatPage from "./pages/ChatPage";
 import MetricsPage from "./pages/MetricsPage";
 import CalendarPage from "./pages/CalendarPage";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -25,8 +26,22 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/chat" element={<ChatPage />} />
-              <Route path="/metrics" element={<MetricsPage />} />
-              <Route path="/calendar" element={<CalendarPage />} />
+              <Route 
+                path="/metrics" 
+                element={
+                  <ProtectedRoute>
+                    <MetricsPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/calendar" 
+                element={
+                  <ProtectedRoute>
+                    <CalendarPage />
+                  </ProtectedRoute>
+                } 
+              />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
