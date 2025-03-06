@@ -5,39 +5,50 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AlertCircle } from 'lucide-react';
 
 export function SignUpForm({ onSuccess }: { onSuccess?: () => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { signUp, signInWithGoogle } = useAuth();
   const id = useId();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!acceptTerms) {
-      return; // Prevent submission if terms are not accepted
+      setErrorMessage("You must accept the Terms of Service and Privacy Policy to continue.");
+      return;
     }
     
+    setErrorMessage(null);
     setIsLoading(true);
     
     try {
       await signUp(email, password);
       if (onSuccess) onSuccess();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Sign up error:', error);
+      setErrorMessage(error.message || 'Failed to sign up. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
+    setErrorMessage(null);
     try {
       await signInWithGoogle();
       // Note: onSuccess will not be called here as the OAuth flow redirects the page
-    } catch (error) {
+    } catch (error: any) {
       console.error('Google sign in error:', error);
+      if (error.message.includes('provider is not enabled')) {
+        setErrorMessage('Google authentication is not enabled in this Supabase project. Please enable it in the Supabase dashboard under Authentication > Providers.');
+      } else {
+        setErrorMessage(error.message || 'Failed to sign up with Google. Please try again.');
+      }
     }
   };
 
@@ -61,6 +72,13 @@ export function SignUpForm({ onSuccess }: { onSuccess?: () => void }) {
           <p className="text-sm text-muted-foreground">Enter your details to create a new account</p>
         </div>
       </div>
+
+      {errorMessage && (
+        <div className="bg-destructive/15 text-destructive p-3 rounded-lg flex items-start gap-2">
+          <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+          <p className="text-sm">{errorMessage}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-4">
@@ -92,7 +110,6 @@ export function SignUpForm({ onSuccess }: { onSuccess?: () => void }) {
             id={`${id}-terms`} 
             checked={acceptTerms}
             onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
-            required
           />
           <Label htmlFor={`${id}-terms`} className="font-normal text-muted-foreground">
             I agree to the <a href="#" className="underline hover:no-underline">Terms of Service</a> and <a href="#" className="underline hover:no-underline">Privacy Policy</a>

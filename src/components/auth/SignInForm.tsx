@@ -5,36 +5,52 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { LogIn } from 'lucide-react';
+import { LogIn, AlertCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { signIn, signInWithGoogle } = useAuth();
+  const { toast } = useToast();
   const id = useId();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
     setIsLoading(true);
     
     try {
       await signIn(email, password);
       if (onSuccess) onSuccess();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Sign in error:', error);
+      setErrorMessage(error.message || 'Failed to sign in. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
+    setErrorMessage(null);
     try {
       await signInWithGoogle();
       // Note: onSuccess will not be called here as the OAuth flow redirects the page
-    } catch (error) {
+    } catch (error: any) {
       console.error('Google sign in error:', error);
+      if (error.message.includes('provider is not enabled')) {
+        setErrorMessage('Google authentication is not enabled in this Supabase project. Please enable it in the Supabase dashboard under Authentication > Providers.');
+        toast({
+          title: "Setup Required",
+          description: "Google authentication needs to be enabled in the Supabase dashboard",
+          variant: "destructive"
+        });
+      } else {
+        setErrorMessage(error.message || 'Failed to sign in with Google. Please try again.');
+      }
     }
   };
 
@@ -58,6 +74,13 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
           <p className="text-sm text-muted-foreground">Enter your credentials to login to your account.</p>
         </div>
       </div>
+
+      {errorMessage && (
+        <div className="bg-destructive/15 text-destructive p-3 rounded-lg flex items-start gap-2">
+          <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+          <p className="text-sm">{errorMessage}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-4">

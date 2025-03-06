@@ -68,18 +68,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           redirectTo: `${window.location.origin}/`
         }
       });
-      if (error) throw error;
+      
+      if (error) {
+        // Check specifically for the provider not enabled error
+        if (error.message.includes('provider is not enabled')) {
+          toast({
+            title: "Google sign in failed",
+            description: "Google authentication is not enabled in this Supabase project. Please enable it in the Supabase dashboard under Authentication > Providers.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Google sign in failed",
+            description: error.message,
+            variant: "destructive"
+          });
+        }
+        throw error;
+      }
+      
       toast({
         title: "Redirecting to Google",
         description: "Please continue in the Google authentication window"
       });
     } catch (error: any) {
-      toast({
-        title: "Google sign in failed",
-        description: error.message,
-        variant: "destructive"
-      });
-      throw error;
+      console.error('Google sign in error:', error);
+      // Error is already handled in the try block
     }
   };
 
