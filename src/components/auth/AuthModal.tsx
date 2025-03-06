@@ -1,11 +1,15 @@
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogTrigger 
+} from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SignInForm } from './SignInForm';
 import { SignUpForm } from './SignUpForm';
 import { Button } from '@/components/ui/button';
-import { LogIn, UserPlus } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 
 interface AuthModalProps {
   triggerButton?: React.ReactNode;
@@ -31,27 +35,16 @@ export function AuthModal({ triggerButton, defaultTab = 'signIn', onSuccess }: A
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle className="text-2xl text-center font-bold">
-            Welcome to HealthyAI
-          </DialogTitle>
-        </DialogHeader>
-        <Tabs defaultValue={defaultTab} className="mt-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signIn" className="flex items-center gap-2">
-              <LogIn className="h-4 w-4" />
-              Sign In
-            </TabsTrigger>
-            <TabsTrigger value="signUp" className="flex items-center gap-2">
-              <UserPlus className="h-4 w-4" />
-              Sign Up
-            </TabsTrigger>
+      <DialogContent className="sm:max-w-[425px] p-6 gap-0">
+        <Tabs defaultValue={defaultTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="signIn">Sign In</TabsTrigger>
+            <TabsTrigger value="signUp">Sign Up</TabsTrigger>
           </TabsList>
-          <TabsContent value="signIn" className="pt-4">
+          <TabsContent value="signIn">
             <SignInForm onSuccess={handleSuccess} />
           </TabsContent>
-          <TabsContent value="signUp" className="pt-4">
+          <TabsContent value="signUp">
             <SignUpForm onSuccess={handleSuccess} />
           </TabsContent>
         </Tabs>
