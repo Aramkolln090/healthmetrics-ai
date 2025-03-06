@@ -19,6 +19,7 @@ import {
   CalendarDays
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { GlowButton } from "@/components/ui/glow-button";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -189,12 +190,15 @@ const Index = () => {
           <AIPreview />
           
           <div className="mt-12 text-center">
-            <Button 
+            <GlowButton 
               onClick={() => navigate('/chat')} 
               className="rounded-full px-8"
+              glowColors={['#8B5CF6', '#D946EF', '#0EA5E9', '#F97316']}
+              glowMode="flowHorizontal"
+              glowBlur="soft"
             >
               Talk to Your AI Assistant
-            </Button>
+            </GlowButton>
           </div>
         </section>
         

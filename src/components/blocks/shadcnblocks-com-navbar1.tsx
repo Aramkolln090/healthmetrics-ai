@@ -3,6 +3,7 @@ import { Book, Menu, Sunset, Trees, Zap } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { GlowButton } from "@/components/ui/glow-button";
 
 import {
   Accordion,
@@ -182,13 +183,17 @@ const Navbar1 = ({
                 }
               />
             )}
-            <Button 
-              asChild 
+            <GlowButton 
               size="sm"
+              className="rounded-full"
               onClick={() => navigate('/chat')}
+              glowColors={['#8B5CF6', '#D946EF', '#0EA5E9', '#F97316']}
+              glowMode="colorShift"
+              glowBlur="soft"
+              glowScale={1.2}
             >
-              <Link to="/chat">Get Started</Link>
-            </Button>
+              Get Started
+            </GlowButton>
           </div>
         </nav>
         <div className="block lg:hidden">
@@ -258,11 +263,14 @@ const Navbar1 = ({
                         }
                       />
                     )}
-                    <Button 
+                    <GlowButton 
                       onClick={() => navigate('/chat')}
+                      glowColors={['#8B5CF6', '#D946EF', '#0EA5E9', '#F97316']}
+                      glowMode="flowHorizontal"
+                      glowBlur="soft"
                     >
                       Get Started
-                    </Button>
+                    </GlowButton>
                   </div>
                 </div>
               </SheetContent>

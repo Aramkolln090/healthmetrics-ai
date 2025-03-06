@@ -6,6 +6,7 @@ import { TextHoverEffect } from "@/components/ui/text-hover-effect";
 import { ArrowRight } from "lucide-react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { motion } from "framer-motion";
+import { GlowButton } from "@/components/ui/glow-button";
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -35,14 +36,19 @@ const HeroSection = () => {
           </h2>
 
           <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 transition-all duration-1000 delay-500 ${isVisible ? "opacity-100" : "opacity-0"}`}>
-            <Button 
+            <GlowButton 
               size="lg" 
-              className="rounded-full px-8 py-6 text-base shadow-md hover:shadow-lg transition-all duration-300"
+              className="rounded-full px-8 py-6 text-base"
               onClick={handleGetStarted}
+              glowColors={['#8B5CF6', '#D946EF', '#0EA5E9', '#F97316']}
+              glowMode="colorShift"
+              glowBlur="soft"
+              glowScale={1.2}
+              glowDuration={6}
             >
               Get Started
               <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+            </GlowButton>
             <Button variant="outline" size="lg" className="rounded-full px-8 py-6 text-base hover:bg-secondary/80 transition-all duration-300">
               View Demo
             </Button>
