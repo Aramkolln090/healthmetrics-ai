@@ -38,19 +38,14 @@ const HeroSection = () => {
           </h2>
 
           <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 transition-all duration-1000 delay-500 ${isVisible ? "opacity-100" : "opacity-0"}`}>
-            <GlowButton 
+            <Button 
               size={isMobile ? "default" : "lg"} 
-              className={`rounded-full ${isMobile ? 'px-6 py-5 text-sm w-full' : 'px-8 py-6 text-base'} font-semibold`}
+              className={`rounded-full bg-primary/90 hover:bg-primary ${isMobile ? 'px-6 py-5 text-sm w-full' : 'px-8 py-6 text-base'} font-semibold`}
               onClick={handleGetStarted}
-              glowColors={['#8B5CF6', '#D946EF', '#0EA5E9', '#F97316']}
-              glowMode="flowHorizontal"
-              glowBlur="soft"
-              glowScale={1.15}
-              glowDuration={4}
             >
               Get Started
               <ArrowRight className="ml-2 h-4 w-4 animate-pulse-subtle" />
-            </GlowButton>
+            </Button>
             <Button 
               variant="outline" 
               size={isMobile ? "default" : "lg"} 
