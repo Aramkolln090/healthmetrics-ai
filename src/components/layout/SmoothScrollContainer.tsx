@@ -49,7 +49,7 @@ const SmoothScrollContainer: React.FC<SmoothScrollContainerProps> = ({ children 
         <button
           id="scroll-to-top"
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 items-center justify-center w-10 h-10 rounded-full bg-primary text-white shadow-lg hover:bg-primary/90 transition-all duration-300"
+          className="hidden fixed bottom-6 right-6 z-50 items-center justify-center w-10 h-10 rounded-full bg-primary text-white shadow-lg hover:bg-primary/90 transition-all duration-300"
           aria-label="Scroll to top"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
