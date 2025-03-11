@@ -1,8 +1,8 @@
+
 import { Book, Menu, Sunset, Trees, Zap } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal } from "@/components/auth/AuthModal";
-import { GlowButton } from "@/components/ui/glow-button";
 
 import {
   Accordion,

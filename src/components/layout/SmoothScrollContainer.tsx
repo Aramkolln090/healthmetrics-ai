@@ -31,6 +31,7 @@ const SmoothScrollContainer: React.FC<SmoothScrollContainerProps> = ({ children 
     };
 
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Check initial scroll position
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
