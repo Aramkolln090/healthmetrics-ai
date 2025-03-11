@@ -35,6 +35,30 @@ const SmoothScrollContainer: React.FC<SmoothScrollContainerProps> = ({ children 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Enable smooth scrolling for anchor links
+  useEffect(() => {
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const anchor = target.closest('a');
+      
+      if (anchor && anchor.getAttribute('href')?.startsWith('#')) {
+        e.preventDefault();
+        const id = anchor.getAttribute('href')?.replace('#', '');
+        const element = document.getElementById(id || '');
+        
+        if (element) {
+          element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+        }
+      }
+    };
+
+    document.addEventListener('click', handleAnchorClick);
+    return () => document.removeEventListener('click', handleAnchorClick);
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
