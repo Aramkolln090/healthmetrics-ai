@@ -38,8 +38,9 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
     setErrorMessage(null);
     try {
       // Get the current URL for proper redirect
-      const currentUrl = window.location.origin;
-      await signInWithGoogle(currentUrl);
+      const redirectUrl = window.location.origin;
+      console.log("SignInForm - Redirecting to:", redirectUrl);
+      await signInWithGoogle(redirectUrl);
       // Note: onSuccess will not be called here as the OAuth flow redirects the page
     } catch (error: any) {
       console.error('Google sign in error:', error);

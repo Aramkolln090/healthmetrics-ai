@@ -9,7 +9,7 @@ type AuthContextType = {
   session: Session | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: (redirectTo?: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -60,14 +60,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Sign in with Google
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (redirectTo?: string) => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const options = {
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: redirectTo || `${window.location.origin}/`
         }
-      });
+      };
+      
+      console.log("Signing in with Google, redirectTo:", options.options.redirectTo);
+      
+      const { error } = await supabase.auth.signInWithOAuth(options);
       
       if (error) {
         // Check specifically for the provider not enabled error
