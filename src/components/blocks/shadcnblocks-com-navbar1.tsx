@@ -1,4 +1,3 @@
-
 import { Book, Menu, Sunset, Trees, Zap } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -183,17 +182,13 @@ const Navbar1 = ({
                 }
               />
             )}
-            <GlowButton 
+            <Button 
               size="sm"
-              className="rounded-full"
+              className="rounded-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white"
               onClick={() => navigate('/chat')}
-              glowColors={['#8B5CF6', '#D946EF', '#0EA5E9', '#F97316']}
-              glowMode="colorShift"
-              glowBlur="soft"
-              glowScale={1.2}
             >
               Get Started
-            </GlowButton>
+            </Button>
           </div>
         </nav>
         <div className="block lg:hidden">
@@ -263,14 +258,12 @@ const Navbar1 = ({
                         }
                       />
                     )}
-                    <GlowButton 
+                    <Button 
                       onClick={() => navigate('/chat')}
-                      glowColors={['#8B5CF6', '#D946EF', '#0EA5E9', '#F97316']}
-                      glowMode="flowHorizontal"
-                      glowBlur="soft"
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white"
                     >
                       Get Started
-                    </GlowButton>
+                    </Button>
                   </div>
                 </div>
               </SheetContent>

@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navbar1 } from "@/components/blocks/shadcnblocks-com-navbar1";
@@ -24,12 +23,10 @@ import { GlowButton } from "@/components/ui/glow-button";
 const Index = () => {
   const navigate = useNavigate();
   
-  // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Medication reminder cards
   const medicationCards = [
     {
       icon: <Pill className="size-4 text-red-300" />,
@@ -64,10 +61,8 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar1 />
       <div className="pt-24">
-        {/* Hero Section */}
         <HeroSection />
         
-        {/* Features Section */}
         <section id="features" className="py-24 px-4 relative">
           <div className="container mx-auto text-center mb-16">
             <span className="text-sm font-medium text-primary">Features</span>
@@ -120,7 +115,6 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Medication Reminders Section */}
         <section id="reminders" className="py-24 px-4 bg-gradient-to-b from-blue-50/50 to-white">
           <div className="container mx-auto text-center mb-16">
             <span className="text-sm font-medium text-primary">Reminders</span>
@@ -149,7 +143,6 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Metrics Section */}
         <section id="metrics" className="py-24 px-4 bg-gradient-to-b from-white to-blue-50">
           <div className="container mx-auto text-center mb-16">
             <span className="text-sm font-medium text-primary">Metrics</span>
@@ -174,7 +167,6 @@ const Index = () => {
           </div>
         </section>
         
-        {/* AI Assistant Section */}
         <section id="ai-assistant" className="py-24 px-4">
           <div className="container mx-auto text-center mb-16">
             <span className="text-sm font-medium text-primary">AI Assistant</span>
@@ -190,19 +182,15 @@ const Index = () => {
           <AIPreview />
           
           <div className="mt-12 text-center">
-            <GlowButton 
+            <Button 
               onClick={() => navigate('/chat')} 
-              className="rounded-full px-8"
-              glowColors={['#8B5CF6', '#D946EF', '#0EA5E9', '#F97316']}
-              glowMode="flowHorizontal"
-              glowBlur="soft"
+              className="rounded-full px-8 py-6 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-md transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
             >
               Talk to Your AI Assistant
-            </GlowButton>
+            </Button>
           </div>
         </section>
         
-        {/* Footer */}
         <footer className="py-12 px-4 border-t">
           <div className="container mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center">

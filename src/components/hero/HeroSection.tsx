@@ -6,7 +6,6 @@ import { TextHoverEffect } from "@/components/ui/text-hover-effect";
 import { ArrowRight } from "lucide-react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { motion } from "framer-motion";
-import { GlowButton } from "@/components/ui/glow-button";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 const HeroSection = () => {
@@ -40,11 +39,15 @@ const HeroSection = () => {
           <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 transition-all duration-1000 delay-500 ${isVisible ? "opacity-100" : "opacity-0"}`}>
             <Button 
               size={isMobile ? "default" : "lg"} 
-              className={`rounded-full bg-primary/90 hover:bg-primary ${isMobile ? 'px-6 py-5 text-sm w-full' : 'px-8 py-6 text-base'} font-semibold`}
+              className={`rounded-full relative overflow-hidden ${isMobile ? 'px-6 py-5 text-sm w-full' : 'px-8 py-6 text-base'} font-semibold
+                bg-gradient-to-r from-purple-600 via-pink-600 to-blue-500 hover:from-purple-500 hover:via-pink-500 hover:to-blue-400
+                text-white shadow-md transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]`}
               onClick={handleGetStarted}
             >
-              Get Started
-              <ArrowRight className="ml-2 h-4 w-4 animate-pulse-subtle" />
+              <span className="relative z-10 flex items-center justify-center">
+                Get Started
+                <ArrowRight className="ml-2 h-4 w-4 animate-pulse-subtle" />
+              </span>
             </Button>
             <Button 
               variant="outline" 
