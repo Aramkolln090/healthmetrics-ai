@@ -27,9 +27,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshAttempts = useRef<number>(0);
   const refreshTimeout = useRef<NodeJS.Timeout>();
   const isInitialized = useRef<boolean>(false);
+  const sessionCache = useRef<Session | null>(null);
 
   const getBackoffTime = (attempts: number) => {
-    return Math.min(Math.pow(2, attempts) * 1000, 30000);
+    // Add jitter to prevent all clients from retrying at the same time
+    const jitter = Math.random() * 0.3 + 0.85; // 0.85-1.15 multiplier
+    // Exponential backoff with max of 60 seconds
+    return Math.min(Math.pow(2, attempts) * 1000 * jitter, 60000);
   };
 
   const refreshSession = useCallback(async (force = false) => {
@@ -40,9 +44,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return refreshPromise.current;
     }
 
+    // If we have a cached session and it's not going to expire in the next 5 minutes, use it
+    if (sessionCache.current && !force) {
+      const expiresAt = sessionCache.current.expires_at;
+      if (expiresAt) {
+        const expiryTime = expiresAt * 1000; // Convert to milliseconds
+        const timeToExpiry = expiryTime - now;
+        if (timeToExpiry > 300000) { // 5 minutes
+          return Promise.resolve(sessionCache.current);
+        }
+      }
+    }
+
     // Don't refresh if we're within the backoff period
     if (!force && now - lastRefreshTime.current < getBackoffTime(refreshAttempts.current)) {
-      return session;
+      return sessionCache.current || session;
     }
 
     // Clear any existing timeout
@@ -57,11 +73,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (storedSession) {
           refreshAttempts.current = 0;
+          sessionCache.current = storedSession;
           return storedSession;
         }
 
         // If no stored session and we've already tried initializing, don't keep trying
         if (isInitialized.current) {
+          sessionCache.current = null;
           return null;
         }
 
@@ -70,9 +88,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const { data: { session: newSession }, error: refreshError } = await supabase.auth.refreshSession();
           if (refreshError) throw refreshError;
           refreshAttempts.current = 0;
+          sessionCache.current = newSession;
           return newSession;
         }
 
+        sessionCache.current = null;
         return null;
       } catch (error) {
         console.error('Auth refresh error:', error);
@@ -81,15 +101,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (error instanceof Error && error.message.includes('rate limit')) {
           refreshAttempts.current++;
           const backoffTime = getBackoffTime(refreshAttempts.current);
+          console.log(`Auth refresh rate limited. Waiting ${backoffTime/1000}s before retry. Attempt: ${refreshAttempts.current}`);
           refreshTimeout.current = setTimeout(() => {
             refreshPromise.current = null;
           }, backoffTime);
+        } else {
+          console.error('Auth refresh error (non-rate limit):', error);
         }
 
         // If it's not a rate limit error, or we've exceeded max attempts, clear the session
-        if (refreshAttempts.current > 5 || !error.message?.includes('rate limit')) {
+        if (refreshAttempts.current > 5 || !(error.message?.includes('rate limit'))) {
           setSession(null);
           setUser(null);
+          sessionCache.current = null;
           return null;
         }
 
@@ -117,14 +141,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (initialSession) {
             setSession(initialSession);
             setUser(initialSession.user);
+            sessionCache.current = initialSession;
             
             // Only set up refresh interval if we have a session
+            // Refresh every 10 minutes instead of 4
             refreshInterval = setInterval(() => {
               refreshSession();
-            }, 240000); // 4 minutes
+            }, 600000);
           } else {
             setSession(null);
             setUser(null);
+            sessionCache.current = null;
           }
           setIsLoading(false);
         }
@@ -134,6 +161,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setIsLoading(false);
           setSession(null);
           setUser(null);
+          sessionCache.current = null;
         }
       }
     };
@@ -143,13 +171,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
       if (!mounted) return;
 
+      console.log('Auth state change:', event);
+
       if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') {
         setSession(newSession);
         setUser(newSession?.user ?? null);
+        sessionCache.current = newSession;
         refreshAttempts.current = 0;
       } else if (event === 'SIGNED_OUT') {
         setSession(null);
         setUser(null);
+        sessionCache.current = null;
         refreshPromise.current = null;
         refreshAttempts.current = 0;
         if (refreshInterval) clearInterval(refreshInterval);
