@@ -1,9 +1,10 @@
-
 import { useState } from 'react';
 import { 
   Dialog, 
   DialogContent, 
-  DialogTrigger 
+  DialogTrigger,
+  DialogTitle,
+  DialogDescription
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SignInForm } from './SignInForm';
@@ -36,6 +37,8 @@ export function AuthModal({ triggerButton, defaultTab = 'signIn', onSuccess }: A
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] p-6 gap-0">
+        <DialogTitle>Welcome to HealthyAI</DialogTitle>
+        <DialogDescription>Sign in or create an account to get started.</DialogDescription>
         <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="signIn">Sign In</TabsTrigger>
