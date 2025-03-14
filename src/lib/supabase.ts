@@ -71,6 +71,7 @@ async function customFetch(url: RequestInfo | URL, options: RequestInit = {}) {
     // Require at least 1 second between token refresh attempts
     const minInterval = Math.max(1000, tokenRateLimits.retryCount * 5000);
     if (now - tokenRateLimits.lastCall < minInterval) {
+      console.log(`Throttling token refresh. Last call was ${(now - tokenRateLimits.lastCall)/1000}s ago.`);
       const error = new Error('Too many refresh attempts - throttled by client');
       error.name = 'ThrottleError';
       throw error;
@@ -86,8 +87,15 @@ async function customFetch(url: RequestInfo | URL, options: RequestInit = {}) {
     signal: options.signal || (AbortSignal?.timeout ? AbortSignal.timeout(30000) : undefined),
   };
 
+  // Add a unique request ID for debugging
+  const requestId = Math.random().toString(36).substring(2, 10);
+  
   while (retries < maxRetries) {
     try {
+      if (import.meta.env.DEV && isTokenRefresh) {
+        console.log(`[${requestId}] Attempting token refresh (attempt ${retries + 1}/${maxRetries})`);
+      }
+      
       const response = await fetch(url, timeoutOptions);
       
       // Only retry on specific status codes
@@ -125,6 +133,9 @@ async function customFetch(url: RequestInfo | URL, options: RequestInit = {}) {
       
       // Reset rate limit state on successful token refresh
       if (isTokenRefresh && response.ok) {
+        if (import.meta.env.DEV) {
+          console.log(`[${requestId}] Token refresh successful`);
+        }
         tokenRateLimits.retryCount = 0;
         tokenRateLimits.isRateLimited = false;
       }
@@ -132,8 +143,14 @@ async function customFetch(url: RequestInfo | URL, options: RequestInit = {}) {
       return response;
     } catch (error: any) {
       lastError = error;
+      
+      // Log the error in development
+      if (import.meta.env.DEV) {
+        console.error(`[${requestId}] Fetch error:`, error.name, error.message);
+      }
+      
       // Only retry on network errors, not on client errors
-      if (error.name === 'AbortError' || error.name === 'TypeError') {
+      if (error.name === 'AbortError' || error.name === 'TypeError' || error.name === 'NetworkError') {
         const delayMs = Math.pow(2, retries) * 1000;
         if (import.meta.env.DEV) {
           console.log(`Network error. Retrying after ${delayMs/1000}s...`);
@@ -141,8 +158,20 @@ async function customFetch(url: RequestInfo | URL, options: RequestInit = {}) {
         await new Promise(resolve => setTimeout(resolve, delayMs));
         retries++;
       } else {
+        // Don't retry other types of errors
         break;
       }
+    }
+  }
+  
+  // If we're here, we've failed after multiple retries
+  if (isTokenRefresh) {
+    // If this was a token refresh request, set a longer cooldown
+    tokenRateLimits.isRateLimited = true;
+    tokenRateLimits.cooldownEnd = Date.now() + 60000; // 1 minute
+    
+    if (import.meta.env.DEV) {
+      console.log(`[${requestId}] Token refresh failed after ${maxRetries} attempts. Setting 1 minute cooldown.`);
     }
   }
   
