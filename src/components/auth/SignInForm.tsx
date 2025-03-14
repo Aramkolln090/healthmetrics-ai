@@ -1,4 +1,3 @@
-
 import { useState, useId } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { signIn, signInWithGoogle } = useAuth();
@@ -24,11 +23,23 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
     setIsLoading(true);
     
     try {
-      await signIn(email, password);
-      if (onSuccess) onSuccess();
+      await signIn(email, password, rememberMe);
+      
+      localStorage.removeItem('auth_error');
+      
+      if (onSuccess) {
+        setTimeout(() => {
+          onSuccess();
+        }, 100);
+      }
     } catch (error: any) {
       console.error('Sign in error:', error);
       setErrorMessage(error.message || 'Failed to sign in. Please try again.');
+      
+      localStorage.setItem('auth_error', JSON.stringify({
+        message: error.message,
+        time: new Date().toISOString()
+      }));
     } finally {
       setIsLoading(false);
     }
@@ -37,11 +48,9 @@ export function SignInForm({ onSuccess }: { onSuccess?: () => void }) {
   const handleGoogleSignIn = async () => {
     setErrorMessage(null);
     try {
-      // Get the current URL for proper redirect
-      const redirectUrl = window.location.origin;
+      const redirectUrl = window.location.href;
       console.log("SignInForm - Redirecting to:", redirectUrl);
       await signInWithGoogle(redirectUrl);
-      // Note: onSuccess will not be called here as the OAuth flow redirects the page
     } catch (error: any) {
       console.error('Google sign in error:', error);
       if (error.message.includes('provider is not enabled')) {

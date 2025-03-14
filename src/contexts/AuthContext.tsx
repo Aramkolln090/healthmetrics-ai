@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   signInWithGoogle: (redirectTo?: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -198,9 +198,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [refreshSession]);
 
   // Sign in with email/password
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, rememberMe: boolean = true) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      // Update the local storage setting for session persistence
+      if (typeof localStorage !== 'undefined') {
+        if (rememberMe) {
+          localStorage.setItem('supabase.auth.token.persistent', 'true');
+        } else {
+          localStorage.setItem('supabase.auth.token.persistent', 'false');
+        }
+      }
+      
+      const { error } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password 
+      });
+      
       if (error) throw error;
       toast({
         title: "Signed in successfully",

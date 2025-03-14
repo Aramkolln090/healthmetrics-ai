@@ -1,6 +1,5 @@
-
 import React, { useId } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SignInForm } from '@/components/auth/SignInForm';
 import { SignUpForm } from '@/components/auth/SignUpForm';
@@ -8,18 +7,23 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const id = useId();
   
-  // If user is already authenticated, redirect to home
+  // Get the location the user was trying to access
+  const from = location.state?.from || '/';
+  
+  // If user is already authenticated, redirect to the page they were trying to access
   React.useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate(from, { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, from]);
 
   const handleSuccess = () => {
-    navigate('/');
+    // Navigate to the page the user was trying to access
+    navigate(from, { replace: true });
   };
 
   return (
