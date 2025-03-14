@@ -28,6 +28,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshTimeout = useRef<NodeJS.Timeout>();
   const isInitialized = useRef<boolean>(false);
   const sessionCache = useRef<Session | null>(null);
+  const isRefreshing = useRef<boolean>(false);
+  const refreshCooldown = useRef<boolean>(false);
+  const lastTokenRefreshedTime = useRef<number>(0);
+  
+  // Minimum time between consecutive token refreshes (in milliseconds)
+  const MIN_REFRESH_INTERVAL = 60000; // 1 minute
 
   const getBackoffTime = (attempts: number) => {
     // Add jitter to prevent all clients from retrying at the same time
@@ -38,10 +44,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshSession = useCallback(async (force = false) => {
     const now = Date.now();
+
+    // Prevent refresh loops by ensuring enough time has passed since the last refresh
+    if (!force && lastTokenRefreshedTime.current > 0 && 
+        now - lastTokenRefreshedTime.current < MIN_REFRESH_INTERVAL) {
+      // console.log('Skipping refresh due to cooldown', 
+      //   (now - lastTokenRefreshedTime.current) / 1000, 'seconds since last refresh');
+      return sessionCache.current || session;
+    }
     
-    // If there's an existing refresh promise, return it
-    if (refreshPromise.current && !force) {
+    // If we're already refreshing, return the existing promise
+    if (isRefreshing.current && refreshPromise.current && !force) {
       return refreshPromise.current;
+    }
+
+    // If we're in a cooldown period, don't refresh
+    if (refreshCooldown.current && !force) {
+      // console.log('Skipping refresh due to cooldown');
+      return sessionCache.current || session;
     }
 
     // If we have a cached session and it's not going to expire in the next 5 minutes, use it
@@ -66,6 +86,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearTimeout(refreshTimeout.current);
     }
 
+    // Set flags to indicate we're refreshing
+    isRefreshing.current = true;
+
     const doRefresh = async () => {
       try {
         // First try to recover session from storage
@@ -74,6 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (storedSession) {
           refreshAttempts.current = 0;
           sessionCache.current = storedSession;
+          lastTokenRefreshedTime.current = now;
           return storedSession;
         }
 
@@ -89,6 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (refreshError) throw refreshError;
           refreshAttempts.current = 0;
           sessionCache.current = newSession;
+          lastTokenRefreshedTime.current = now;
           return newSession;
         }
 
@@ -102,8 +127,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           refreshAttempts.current++;
           const backoffTime = getBackoffTime(refreshAttempts.current);
           console.log(`Auth refresh rate limited. Waiting ${backoffTime/1000}s before retry. Attempt: ${refreshAttempts.current}`);
+          
+          // Set a cooldown period
+          refreshCooldown.current = true;
+          setTimeout(() => {
+            refreshCooldown.current = false;
+          }, backoffTime);
+          
           refreshTimeout.current = setTimeout(() => {
             refreshPromise.current = null;
+            isRefreshing.current = false;
           }, backoffTime);
         } else {
           console.error('Auth refresh error (non-rate limit):', error);
@@ -121,6 +154,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } finally {
         lastRefreshTime.current = now;
         isInitialized.current = true;
+        // Reset the refreshing flag after a delay to prevent immediate retries
+        setTimeout(() => {
+          isRefreshing.current = false;
+        }, 5000);
       }
     };
 
@@ -142,12 +179,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setSession(initialSession);
             setUser(initialSession.user);
             sessionCache.current = initialSession;
+            lastTokenRefreshedTime.current = Date.now();
             
             // Only set up refresh interval if we have a session
-            // Refresh every 10 minutes instead of 4
+            // Refresh every 15 minutes instead of 10
             refreshInterval = setInterval(() => {
               refreshSession();
-            }, 600000);
+            }, 900000); // 15 minutes
           } else {
             setSession(null);
             setUser(null);
@@ -171,19 +209,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
       if (!mounted) return;
 
-      console.log('Auth state change:', event);
+      // Only log in development
+      if (import.meta.env.DEV) {
+        console.log('Auth state change:', event);
+      }
 
       if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') {
+        // Prevent setting state if this event was triggered by our own refresh
+        const now = Date.now();
+        if (event === 'TOKEN_REFRESHED' && now - lastTokenRefreshedTime.current < 2000) {
+          // Skip re-setting state if we just refreshed the token ourselves
+          // This prevents refresh loops
+          return;
+        }
+        
         setSession(newSession);
         setUser(newSession?.user ?? null);
         sessionCache.current = newSession;
         refreshAttempts.current = 0;
+        
+        // Update the last refreshed time when we get a token refreshed event
+        if (event === 'TOKEN_REFRESHED') {
+          lastTokenRefreshedTime.current = now;
+        }
       } else if (event === 'SIGNED_OUT') {
         setSession(null);
         setUser(null);
         sessionCache.current = null;
         refreshPromise.current = null;
         refreshAttempts.current = 0;
+        lastTokenRefreshedTime.current = 0;
         if (refreshInterval) clearInterval(refreshInterval);
       }
       setIsLoading(false);
