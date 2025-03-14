@@ -11,169 +11,19 @@ const shouldPersistSession = () => {
   return persistValue !== 'false'; // Default to true unless explicitly set to false
 };
 
-// Create a Supabase client with custom settings
+// Create a Supabase client with retry options
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    // We will manage token refresh manually to avoid loops
+    // Disable automatic token refresh to manage it ourselves
     autoRefreshToken: false,
     persistSession: shouldPersistSession(),
     detectSessionInUrl: true,
     storageKey: 'healthmetrics-auth-storage',
-    flowType: 'pkce',
   },
   global: {
-    // Add rate limiting tracking
-    headers: {
-      'x-client-info': 'health-metrics-ai-web-client'
-    },
-    fetch: (...args) => {
-      const [url, options] = args;
-      return customFetch(url, options);
+    // Add basic retry logic for network errors
+    fetch: (url, options) => {
+      return fetch(url, options);
     },
   },
-  // Add debug logging in development
-  ...(import.meta.env.DEV ? { 
-    debug: import.meta.env.DEV ? true : false, 
-  } : {}),
 });
-
-// Track rate limit for token endpoints
-const tokenRateLimits = {
-  lastCall: 0,
-  retryCount: 0,
-  isRateLimited: false,
-  cooldownEnd: 0,
-};
-
-// Custom fetch function with retry logic
-async function customFetch(url: RequestInfo | URL, options: RequestInit = {}) {
-  const maxRetries = 3;
-  let retries = 0;
-  let lastError;
-
-  // Check if this is a token refresh request
-  const isTokenRefresh = url.toString().includes('/auth/v1/token');
-  
-  // For token refresh, enforce rate limiting
-  if (isTokenRefresh) {
-    const now = Date.now();
-    
-    // If we're in a cool-down period, throw a rate limit error immediately
-    if (tokenRateLimits.isRateLimited && now < tokenRateLimits.cooldownEnd) {
-      const remainingMs = tokenRateLimits.cooldownEnd - now;
-      console.log(`Token refresh in cool-down period. ${Math.ceil(remainingMs/1000)}s remaining.`);
-      
-      const error = new Error('Request rate limit reached - enforced by client');
-      error.name = 'RateLimitError';
-      throw error;
-    }
-    
-    // Require at least 1 second between token refresh attempts
-    const minInterval = Math.max(1000, tokenRateLimits.retryCount * 5000);
-    if (now - tokenRateLimits.lastCall < minInterval) {
-      console.log(`Throttling token refresh. Last call was ${(now - tokenRateLimits.lastCall)/1000}s ago.`);
-      const error = new Error('Too many refresh attempts - throttled by client');
-      error.name = 'ThrottleError';
-      throw error;
-    }
-    
-    tokenRateLimits.lastCall = now;
-  }
-
-  // Add longer timeout to options
-  const timeoutOptions: RequestInit = {
-    ...options,
-    // Set a longer timeout (30 seconds)
-    signal: options.signal || (AbortSignal?.timeout ? AbortSignal.timeout(30000) : undefined),
-  };
-
-  // Add a unique request ID for debugging
-  const requestId = Math.random().toString(36).substring(2, 10);
-  
-  while (retries < maxRetries) {
-    try {
-      if (import.meta.env.DEV && isTokenRefresh) {
-        console.log(`[${requestId}] Attempting token refresh (attempt ${retries + 1}/${maxRetries})`);
-      }
-      
-      const response = await fetch(url, timeoutOptions);
-      
-      // Only retry on specific status codes
-      if (response.status === 429) {
-        // If rate limited and it's a token refresh, set a cool-down period
-        if (isTokenRefresh) {
-          const retryAfter = parseInt(response.headers.get('Retry-After') || '5');
-          tokenRateLimits.isRateLimited = true;
-          tokenRateLimits.retryCount += 1;
-          // Set a minimum cool-down of 30 seconds, increasing with each attempt
-          const cooldownMs = Math.max(retryAfter * 1000, 30000) * Math.pow(2, tokenRateLimits.retryCount);
-          tokenRateLimits.cooldownEnd = Date.now() + cooldownMs;
-          
-          console.log(`Token endpoint rate limited. Cooling down for ${cooldownMs/1000}s`);
-          
-          // Only retry non-token requests
-          if (isTokenRefresh) {
-            const error = new Error('Request rate limit reached');
-            error.name = 'RateLimitError';
-            throw error;
-          }
-        }
-        
-        // If rate limited, wait longer each time
-        const retryAfter = parseInt(response.headers.get('Retry-After') || '1');
-        const delayMs = retryAfter * 1000 * (retries + 1);
-        
-        if (import.meta.env.DEV) {
-          console.log(`Rate limited. Retrying after ${delayMs/1000}s...`);
-        }
-        await new Promise(resolve => setTimeout(resolve, delayMs));
-        retries++;
-        continue;
-      }
-      
-      // Reset rate limit state on successful token refresh
-      if (isTokenRefresh && response.ok) {
-        if (import.meta.env.DEV) {
-          console.log(`[${requestId}] Token refresh successful`);
-        }
-        tokenRateLimits.retryCount = 0;
-        tokenRateLimits.isRateLimited = false;
-      }
-      
-      return response;
-    } catch (error: any) {
-      lastError = error;
-      
-      // Log the error in development
-      if (import.meta.env.DEV) {
-        console.error(`[${requestId}] Fetch error:`, error.name, error.message);
-      }
-      
-      // Only retry on network errors, not on client errors
-      if (error.name === 'AbortError' || error.name === 'TypeError' || error.name === 'NetworkError') {
-        const delayMs = Math.pow(2, retries) * 1000;
-        if (import.meta.env.DEV) {
-          console.log(`Network error. Retrying after ${delayMs/1000}s...`);
-        }
-        await new Promise(resolve => setTimeout(resolve, delayMs));
-        retries++;
-      } else {
-        // Don't retry other types of errors
-        break;
-      }
-    }
-  }
-  
-  // If we're here, we've failed after multiple retries
-  if (isTokenRefresh) {
-    // If this was a token refresh request, set a longer cooldown
-    tokenRateLimits.isRateLimited = true;
-    tokenRateLimits.cooldownEnd = Date.now() + 60000; // 1 minute
-    
-    if (import.meta.env.DEV) {
-      console.log(`[${requestId}] Token refresh failed after ${maxRetries} attempts. Setting 1 minute cooldown.`);
-    }
-  }
-  
-  throw lastError || new Error('Failed after retries');
-}
