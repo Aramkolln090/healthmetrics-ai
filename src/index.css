@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import 'locomotive-scroll/dist/locomotive-scroll.css';
 
@@ -8,44 +7,46 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222.2 84% 4.9%;
+    /* Light mode - using the blue palette */
+    --background: 202 100% 95%;  /* Very light blue background - derived from #C1E8FF */
+    --foreground: 212 100% 8%;   /* Almost black-blue for text - derived from #021024 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;           /* White for cards */
+    --card-foreground: 212 100% 8%;  /* Dark blue text on cards */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;        /* White for popovers */
+    --popover-foreground: 212 100% 8%;  /* Dark blue text on popovers */
 
-    --primary: 221.2 83% 53.3%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 212 84% 18%;      /* Deep blue as primary - #052659 */
+    --primary-foreground: 0 0% 100%;  /* White text on primary buttons */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 210 38% 60%;    /* Medium blue - #5483B3 */
+    --secondary-foreground: 0 0% 100%;  /* White text on secondary elements */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 38% 95%;        /* Light blue for muted areas */
+    --muted-foreground: 212 40% 40%;  /* Medium blue for muted text */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 197 100% 88%;      /* Light accent color - #C1E8FF */
+    --accent-foreground: 212 84% 18%;  /* Dark blue text on accent */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;  /* Keeping red for destructive */
+    --destructive-foreground: 210 40% 98%;  /* Light text on destructive */
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83% 53.3%;
+    --border: 210 30% 90%;       /* Light blue border */
+    --input: 210 30% 95%;        /* Very light blue for inputs */
+    --ring: 212 84% 18%;         /* Primary color for focus rings */
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar variables with the blue palette */
+    --sidebar-background: 0 0% 100%;  /* White sidebar background */
+    --sidebar-foreground: 212 100% 8%;  /* Dark blue text in sidebar */
+    --sidebar-primary: 212 84% 18%;   /* Deep blue for primary sidebar elements */
+    --sidebar-primary-foreground: 0 0% 100%;  /* White text on sidebar primary */
+    --sidebar-accent: 197 100% 88%;   /* Light blue accent - #C1E8FF */
+    --sidebar-accent-foreground: 212 84% 18%;  /* Dark blue text on sidebar accent */
+    --sidebar-border: 210 30% 90%;    /* Light blue sidebar border */
+    --sidebar-ring: 212 84% 18%;      /* Deep blue for sidebar focus rings */
     
     /* Aurora variables */
     --white: #fff;
@@ -54,41 +55,44 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark mode - using the blue palette */
+    --background: 212 100% 8%;    /* Very dark navy background - #021024 */
+    --foreground: 197 100% 88%;   /* Light blue text - #C1E8FF */
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 212 84% 18%;          /* Deep blue for cards - #052659 */
+    --card-foreground: 197 100% 88%;  /* Light blue text on cards */
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 212 84% 18%;        /* Deep blue for popovers */
+    --popover-foreground: 197 100% 88%;  /* Light blue text on popovers */
 
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 210 38% 60%;        /* Medium blue as primary - #5483B3 */
+    --primary-foreground: 212 100% 8%;  /* Dark text on primary buttons */
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 215 30% 45%;      /* Another blue shade - #7DA0CA */
+    --secondary-foreground: 197 100% 88%;  /* Light text on secondary */
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 212 30% 25%;         /* Muted dark blue */
+    --muted-foreground: 210 38% 80%;  /* Lighter blue for muted text */
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 212 50% 30%;         /* Dark blue accent */
+    --accent-foreground: 197 100% 88%;  /* Light text on accent */
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;   /* Keeping red for destructive */
+    --destructive-foreground: 210 40% 98%;  /* Light text on destructive */
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 212 50% 30%;          /* Darker blue border */
+    --input: 212 50% 25%;           /* Dark blue input */
+    --ring: 215 30% 45%;            /* Medium blue for focus rings */
+
+    /* Sidebar variables with the blue palette */
+    --sidebar-background: 212 84% 18%;     /* Deep blue sidebar - #052659 */
+    --sidebar-foreground: 197 100% 88%;    /* Light blue text in sidebar */
+    --sidebar-primary: 210 38% 60%;        /* Medium blue primary - #5483B3 */
+    --sidebar-primary-foreground: 0 0% 100%;  /* White text on sidebar primary */
+    --sidebar-accent: 212 50% 25%;         /* Darker blue sidebar accent */
+    --sidebar-accent-foreground: 197 100% 88%;  /* Light blue text on sidebar accent */
+    --sidebar-border: 212 60% 20%;         /* Dark blue sidebar border */
+    --sidebar-ring: 210 38% 60%;           /* Medium blue for sidebar focus rings */
   }
 }
 

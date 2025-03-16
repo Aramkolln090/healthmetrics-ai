@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 const flattenColorPalette = (obj: Record<string, any>) => {
@@ -54,6 +53,14 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				// Blue palette from image
+				healthBlue: {
+					950: '#021024', // Very dark navy blue
+					900: '#052659', // Deep navy blue
+					700: '#5483B3', // Medium blue
+					500: '#7DA0CA', // Light blue
+					200: '#C1E8FF', // Very light blue
+				},
 				health: {
 					50: '#f5f7fa',
 					100: '#ebeef3',

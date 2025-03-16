@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Navbar1 } from "@/components/blocks/shadcnblocks-com-navbar1";
 import HeroSection from "@/components/hero/HeroSection";
 import FeatureCard from "@/components/features/FeatureCard";
+import { FeatureSection } from "@/components/features/FeatureSection";
 import AIPreview from "@/components/ai/AIPreview";
 import MetricsPreview from "@/components/metrics/MetricsPreview";
 import DisplayCards from "@/components/ui/display-cards";
@@ -15,7 +16,12 @@ import {
   ShieldCheck,
   Pill,
   Clock,
-  CalendarDays
+  CalendarDays,
+  Smartphone,
+  BarChart,
+  Stethoscope,
+  Users,
+  Target
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlowButton } from "@/components/ui/glow-button";
@@ -57,11 +63,53 @@ const Index = () => {
     },
   ];
 
+  // Feature section steps
+  const featureSteps = [
+    {
+      title: "Track Your Metrics",
+      description: "Record your vital health metrics including blood pressure, glucose levels, and heart rate in a few simple taps.",
+      icon: <Activity className="h-6 w-6" />,
+      image: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1050&q=80"
+    },
+    {
+      title: "Visualize Your Health",
+      description: "See your health trends with beautiful charts and graphs that make understanding your data simple and intuitive.",
+      icon: <BarChart className="h-6 w-6" />,
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1050&q=80"
+    },
+    {
+      title: "Get Smart Insights",
+      description: "Receive personalized health insights and recommendations based on your metrics and health history.",
+      icon: <Brain className="h-6 w-6" />,
+      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1050&q=80"
+    },
+    {
+      title: "Share With Your Doctor",
+      description: "Easily share your health metrics and insights with your healthcare provider for better informed care.",
+      icon: <Stethoscope className="h-6 w-6" />,
+      image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1050&q=80"
+    },
+    {
+      title: "Set Health Goals",
+      description: "Set personalized health goals and track your progress with motivating visualizations and achievements.",
+      icon: <Target className="h-6 w-6" />,
+      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1050&q=80"
+    }
+  ];
+
   return (
     <div className="min-h-screen">
       <Navbar1 />
       <div className="pt-24">
         <HeroSection />
+        
+        {/* New Animated Feature Section */}
+        <FeatureSection 
+          steps={featureSteps}
+          title="Take control of your health"
+          subtitle="Our platform makes it easy to monitor, understand, and improve your health with these simple steps"
+          className="bg-gradient-to-b from-white to-blue-50/50"
+        />
         
         <section id="features" className="py-24 px-4 relative">
           <div className="container mx-auto text-center mb-16">

@@ -22,6 +22,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FullscreenCalendar } from "@/components/calendar/FullscreenCalendar";
+import { SharedSidebar } from "@/components/ui/shared-sidebar";
 
 // Icons for each metric type
 const metricIcons = {
@@ -157,39 +158,9 @@ const CalendarPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="flex pt-16">
-        {/* Sidebar */}
-        <div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-[calc(100vh-4rem)] fixed pt-6">
-          <div className="px-6 mb-6">
-            <div className="flex items-center space-x-3">
-              <Avatar>
-                <AvatarImage src="" />
-                <AvatarFallback className="bg-primary/10 text-primary">
-                  {user?.email?.charAt(0).toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-medium">{user?.email?.split('@')[0] || 'User'}</h3>
-                <p className="text-xs text-muted-foreground">Health Dashboard</p>
-              </div>
-            </div>
-          </div>
-          <div className="space-y-1 px-2">
-            {getSidebarItems().map((item, index) => (
-              <button
-                key={index}
-                onClick={item.onClick}
-                className={`w-full flex items-center space-x-3 px-4 py-2 rounded-md text-sm transition-colors
-                  ${item.label === 'Calendar' 
-                    ? 'bg-primary/10 text-primary font-medium' 
-                    : 'text-muted-foreground hover:bg-gray-100'}`}
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
+        {/* Use the shared sidebar component */}
+        <SharedSidebar />
+        
         {/* Main Content */}
         <div className="flex-1 md:ml-64 p-6">
           <div className="flex items-center justify-between mb-6">

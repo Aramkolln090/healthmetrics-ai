@@ -33,6 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
+import { SharedSidebar } from "@/components/ui/shared-sidebar";
 
 const MetricsPage = () => {
   const { user, session, isLoading: isAuthLoading } = useAuth();
@@ -318,76 +319,9 @@ const MetricsPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="flex pt-16">
-        {/* Sidebar */}
-        <div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-[calc(100vh-4rem)] fixed pt-6">
-          <div className="px-6 mb-6">
-            <div className="flex items-center space-x-3">
-              <Avatar>
-                <AvatarImage src="" />
-                <AvatarFallback className="bg-primary/10 text-primary">
-                  {user?.email?.charAt(0).toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-medium">{user?.email?.split('@')[0] || 'User'}</h3>
-                <p className="text-xs text-muted-foreground">Health Dashboard</p>
-              </div>
-            </div>
-          </div>
-          <div className="space-y-1 px-2">
-            {getSidebarItems().map((item, index) => (
-              <button
-                key={index}
-                onClick={item.onClick}
-                className={`w-full flex items-center space-x-3 px-4 py-2 rounded-md text-sm transition-colors
-                  ${activeView === item.label.toLowerCase() 
-                    ? 'bg-primary/10 text-primary font-medium' 
-                    : 'text-muted-foreground hover:bg-gray-100'}`}
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </div>
-          
-          <div className="mt-auto p-6">
-            <Card className="bg-blue-50 border-blue-100">
-              <CardContent className="p-4">
-                <div className="flex items-start space-x-3">
-                  <div className="bg-blue-100 p-2 rounded-md">
-                    <LineChart className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium mb-1">Track Your Metrics</h4>
-                    <p className="text-xs text-muted-foreground mb-2">Add regular readings to see trends</p>
-                    <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-                      <DialogTrigger asChild>
-                        <Button size="sm" className="text-xs w-full">
-                          <Plus className="mr-1 h-3 w-3" /> Add Reading
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogTitle>Add New Health Reading</DialogTitle>
-                        <DialogDescription>
-                          Enter the details for your new health metric reading.
-                        </DialogDescription>
-                        <MetricForm 
-                          type={activeTab}
-                          onSuccess={() => {
-                            setShowAddForm(false);
-                            fetchMetrics();
-                          }}
-                          onCancel={() => setShowAddForm(false)}
-                        />
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
+        {/* Use the shared sidebar component */}
+        <SharedSidebar />
+        
         {/* Main Content */}
         <div className="flex-1 md:ml-64 p-6">
           {activeView === 'dashboard' ? (
@@ -489,10 +423,10 @@ const MetricsPage = () => {
                         <p className="text-muted-foreground text-sm">No data</p>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
-
-                <Card>
+                </CardContent>
+              </Card>
+              
+              <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm text-muted-foreground font-medium">
                       <div className="flex items-center">
@@ -500,8 +434,8 @@ const MetricsPage = () => {
                         Heart Rate
                       </div>
                     </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                </CardHeader>
+                <CardContent>
                     {heartRateMetrics.length > 0 ? (
                       <>
                         <div className="flex items-end mb-2">
@@ -509,7 +443,7 @@ const MetricsPage = () => {
                             {(heartRateMetrics[0].value as any).bpm}
                           </span>
                           <span className="text-sm text-muted-foreground ml-1 mb-1">bpm</span>
-                        </div>
+                    </div>
                         <div className="flex items-center mb-1">
                           <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-100">
                             Latest Reading
@@ -517,16 +451,16 @@ const MetricsPage = () => {
                           <span className="text-xs text-muted-foreground ml-2">
                             {format(new Date(heartRateMetrics[0].recorded_at), 'MMM dd, HH:mm')}
                           </span>
-                        </div>
+                    </div>
                       </>
                     ) : (
                       <div className="text-center py-4">
                         <p className="text-muted-foreground text-sm">No data</p>
-                      </div>
+                    </div>
                     )}
                   </CardContent>
                 </Card>
-              </div>
+                    </div>
 
               {/* Metrics Chart */}
               <div className="grid grid-cols-1 gap-6 mb-6">
@@ -588,20 +522,20 @@ const MetricsPage = () => {
                             />
                           </DialogContent>
                         </Dialog>
-                      </div>
+                  </div>
                     )}
-                  </CardContent>
-                </Card>
-              </div>
-
+                </CardContent>
+              </Card>
+            </div>
+          
               {/* Recent Activity */}
               <div className="grid grid-cols-1 gap-6">
-                <Card>
+            <Card>
                   <CardHeader>
                     <CardTitle>Recent Activity</CardTitle>
                     <CardDescription>Your most recent health readings</CardDescription>
-                  </CardHeader>
-                  <CardContent>
+              </CardHeader>
+              <CardContent>
                     {recentEntries.length > 0 ? (
                       <div className="space-y-4">
                         {recentEntries.map((entry, idx) => (
@@ -609,19 +543,19 @@ const MetricsPage = () => {
                             <div className="flex items-center">
                               <div className="mr-3 p-2 rounded-full bg-primary/10">
                                 {getMetricCardIcon(entry.type)}
-                              </div>
-                              <div>
+                            </div>
+                            <div>
                                 <p className="font-medium">{formatMetricType(entry.type)}</p>
-                                <p className="text-sm text-muted-foreground">
+                              <p className="text-sm text-muted-foreground">
                                   {format(new Date(entry.recorded_at), 'MMM dd, yyyy HH:mm')}
-                                </p>
+                              </p>
                               </div>
                             </div>
                             <div className="flex items-center">
                               <div className="text-right">
                                 <p className="font-bold">{getMetricValue(entry)}</p>
                                 {entry.notes && <p className="text-xs text-muted-foreground">Note: {entry.notes}</p>}
-                              </div>
+                          </div>
                               <ChevronRight className="ml-2 h-4 w-4 text-muted-foreground" />
                             </div>
                           </div>
@@ -639,8 +573,8 @@ const MetricsPage = () => {
                         </Dialog>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
+                        </CardContent>
+                      </Card>
               </div>
             </>
           ) : (
@@ -695,14 +629,14 @@ const MetricsPage = () => {
                       </DialogContent>
                     </Dialog>
                   </div>
-                </CardHeader>
-                <CardContent>
+              </CardHeader>
+              <CardContent>
                   {isLoading ? (
                     <div className="flex justify-center items-center h-20">
                       <div className="animate-pulse text-center">
                         <div className="h-4 w-32 mx-auto rounded bg-blue-100"></div>
                       </div>
-                    </div>
+                </div>
                   ) : metrics.length > 0 ? (
                     <div className="space-y-4">
                       <table className="w-full">
@@ -778,10 +712,10 @@ const MetricsPage = () => {
                           </Button>
                         </DialogTrigger>
                       </Dialog>
-                    </div>
+                </div>
                   )}
-                </CardContent>
-              </Card>
+              </CardContent>
+            </Card>
             </div>
           )}
         </div>

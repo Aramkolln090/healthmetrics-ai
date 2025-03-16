@@ -30,6 +30,7 @@ import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { metricsService } from "@/lib/db/metrics";
 import { MetricPreferences } from "@/lib/db/types";
+import { SharedSidebar } from "@/components/ui/shared-sidebar";
 
 const SettingsPage = () => {
   const { user, session, signOut, isLoading: isAuthLoading } = useAuth();
@@ -173,50 +174,9 @@ const SettingsPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="flex pt-16">
-        {/* Sidebar */}
-        <div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-[calc(100vh-4rem)] fixed pt-6">
-          <div className="px-6 mb-6">
-            <div className="flex items-center space-x-3">
-              <Avatar>
-                <AvatarImage src="" />
-                <AvatarFallback className="bg-primary/10 text-primary">
-                  {user?.email?.charAt(0).toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-medium">{user?.email?.split('@')[0] || 'User'}</h3>
-                <p className="text-xs text-muted-foreground">Health Dashboard</p>
-              </div>
-            </div>
-          </div>
-          <div className="space-y-1 px-2">
-            {getSidebarItems().map((item, index) => (
-              <button
-                key={index}
-                onClick={item.onClick}
-                className={`w-full flex items-center space-x-3 px-4 py-2 rounded-md text-sm transition-colors
-                  ${item.label === 'Settings' 
-                    ? 'bg-primary/10 text-primary font-medium' 
-                    : 'text-muted-foreground hover:bg-gray-100'}`}
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </div>
-          
-          <div className="mt-auto p-6">
-            <Button 
-              variant="outline" 
-              className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
-              onClick={handleSignOut}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
-            </Button>
-          </div>
-        </div>
-
+        {/* Use the shared sidebar component */}
+        <SharedSidebar />
+        
         {/* Main Content */}
         <div className="flex-1 md:ml-64 p-6">
           <h1 className="text-2xl font-bold mb-6">Settings</h1>
