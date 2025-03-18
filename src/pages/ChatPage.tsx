@@ -342,7 +342,7 @@ const ChatPage: React.FC = () => {
 
   const renderMessageContent = (content: string) => {
     return (
-      <div className="prose prose-sm max-w-none text-gray-800 dark:text-gray-200">
+      <div className="prose prose-sm max-w-none text-current dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-ol:my-1">
         <ReactMarkdown>
           {content}
         </ReactMarkdown>
@@ -386,251 +386,254 @@ const ChatPage: React.FC = () => {
   const hasMessages = currentMessages.length > 1; // Count beyond the initial greeting
 
   return (
-    <div className="min-h-screen flex bg-background">
-      {/* Desktop sidebar - always visible on larger screens */}
-      <div className="hidden lg:block">
-        <ChatSidebar 
-          chats={chats}
-          folders={folders}
-          currentChatId={currentChatId}
-          onNewChat={handleNewChat}
-          onChatSelect={handleChatSelect}
-          onDeleteChat={handleDeleteChat}
-          onRenameChat={handleRenameChat}
-          onCreateFolder={handleCreateFolder}
-          onDeleteFolder={handleDeleteFolder}
-          onRenameFolder={handleRenameFolder}
-        />
-      </div>
-      
-      {/* Mobile sidebar using Sheet */}
-      {isMobile && (
-        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="lg:hidden absolute left-4 top-4 z-30">
-              <Menu className="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-[280px]">
-            <div className="h-full">
-              <ChatSidebar 
-                chats={chats}
-                folders={folders}
-                currentChatId={currentChatId}
-                onNewChat={handleNewChat}
-                onChatSelect={handleChatSelect}
-                onDeleteChat={handleDeleteChat}
-                onRenameChat={handleRenameChat}
-                onCreateFolder={handleCreateFolder}
-                onDeleteFolder={handleDeleteFolder}
-                onRenameFolder={handleRenameFolder}
-              />
-            </div>
-          </SheetContent>
-        </Sheet>
-      )}
-      
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col">
-        {/* Header with hamburger menu and new chat button */}
-        <div className="flex items-center h-14 px-4 border-b">
-          {isMobile && (
-            <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
-              <Menu className="h-5 w-5" />
-            </Button>
-          )}
-          <div className="flex-1 text-lg font-semibold">
-            {currentChat?.title || 'New Chat'}
-          </div>
+    <div className="min-h-screen flex flex-col bg-background">
+      <Navbar />
+      <div className="grid grid-cols-12 flex-1 relative w-full">
+        {/* Mobile sidebar button */}
+        {isMobile && (
           <Button 
-            variant="outline" 
-            size="sm" 
-            className="rounded-md flex items-center gap-1 text-sm"
-            onClick={() => handleNewChat()}
+            variant="ghost" 
+            size="icon" 
+            className="lg:hidden fixed left-4 top-4 z-30"
+            onClick={() => setSidebarOpen(true)}
           >
-            <MessageSquarePlus className="h-4 w-4 mr-1" />
-            <span>New Chat</span>
+            <Menu className="h-5 w-5" />
           </Button>
+        )}
+      
+        {/* Desktop sidebar - always visible on larger screens */}
+        <div className="hidden lg:block lg:col-span-2 xl:col-span-2">
+          <ChatSidebar 
+            chats={chats}
+            folders={folders}
+            currentChatId={currentChatId}
+            onNewChat={handleNewChat}
+            onChatSelect={handleChatSelect}
+            onDeleteChat={handleDeleteChat}
+            onRenameChat={handleRenameChat}
+            onCreateFolder={handleCreateFolder}
+            onDeleteFolder={handleDeleteFolder}
+            onRenameFolder={handleRenameFolder}
+          />
         </div>
         
-        {/* Chat area */}
-        <div className="flex-1 overflow-y-auto">
-          {!hasMessages ? (
-            <div className="flex flex-col items-center justify-center h-full px-4 py-12">
-              <div className="mb-6 p-4 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
-                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M24 4L4 16L24 28L44 16L24 4Z" fill="currentColor" fillOpacity="0.8"/>
-                  <path d="M4 32L24 44L44 32M4 24L24 36L44 24" fill="currentColor" fillOpacity="0.5"/>
-                </svg>
+        {/* Mobile sidebar using Sheet */}
+        {isMobile && (
+          <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+            <SheetContent side="left" className="p-0 w-[290px] max-w-[85vw]">
+              <div className="h-full overflow-y-auto">
+                <ChatSidebar 
+                  chats={chats}
+                  folders={folders}
+                  currentChatId={currentChatId}
+                  onNewChat={handleNewChat}
+                  onChatSelect={handleChatSelect}
+                  onDeleteChat={handleDeleteChat}
+                  onRenameChat={handleRenameChat}
+                  onCreateFolder={handleCreateFolder}
+                  onDeleteFolder={handleDeleteFolder}
+                  onRenameFolder={handleRenameFolder}
+                />
               </div>
-              <h1 className="text-2xl font-bold mb-2 text-center">Welcome to HealthyAI!</h1>
-              <p className="text-center text-muted-foreground max-w-xl mb-8">
-                HealthyAI is your personal health assistant, ready to help you with health information, symptom guidance, and wellness tips.
-              </p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
-                {SUGGESTED_FEATURES.map((feature, index) => (
-                  <div 
-                    key={index}
-                    onClick={() => handleFeatureClick(feature.title)}
-                    className="flex items-center p-3 rounded-lg border hover:bg-accent/50 cursor-pointer"
-                  >
-                    <div className="mr-3 text-xl">{feature.icon}</div>
-                    <div className="text-sm font-medium">{feature.title}</div>
-                  </div>
-                ))}
-              </div>
+            </SheetContent>
+          </Sheet>
+        )}
+        
+        {/* Main content area */}
+        <div className="col-span-12 lg:col-span-10 xl:col-span-10 flex flex-col w-full">
+          {/* Header with new chat button */}
+          <div className="flex items-center h-12 px-4 border-b sticky top-0 bg-background z-10">
+            <div className="flex-1 text-base font-semibold truncate ml-10 lg:ml-0">
+              {currentChat?.title || 'New Chat'}
             </div>
-          ) : (
-            <div className="px-4 py-4 md:px-6">
-              {currentMessages.slice(1).map((message, index) => {
-                const isUser = message.role === 'user';
-                const actualIndex = index + 1; // Account for the welcome message
-                
-                return (
-                  <div key={index} className={`flex mb-8 ${isUser ? 'justify-end' : 'justify-start'}`}>
-                    {!isUser && (
-                      <Avatar className="mr-3 flex-shrink-0 mt-1">
-                        <AvatarFallback className="bg-primary text-primary-foreground">HA</AvatarFallback>
-                      </Avatar>
-                    )}
-                    
-                    <div className={`flex flex-col max-w-[85%] ${isUser ? 'items-end' : 'items-start'}`}>
-                      {editingMessageId === `message-${actualIndex}` ? (
-                        <div className="w-full mb-2">
-                          <Textarea
-                            value={editText}
-                            onChange={(e) => setEditText(e.target.value)}
-                            className="w-full resize-none mb-2"
-                            rows={3}
-                            autoFocus
-                          />
-                          <div className="flex justify-end gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => setEditingMessageId(null)}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={() => saveEditedMessage(actualIndex)}
-                            >
-                              Save & Regenerate
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className={`p-3 rounded-lg ${
-                            isUser
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-muted text-foreground'
-                          }`}>
-                            {renderMessageContent(message.content)}
-                          </div>
-                          
-                          <div className="flex items-center mt-1">
-                            {isUser ? (
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="text-xs text-muted-foreground"
-                                onClick={() => startEditingMessage(actualIndex, message.content)}
-                              >
-                                <Edit className="h-3 w-3 mr-1" />
-                                Edit
-                              </Button>
-                            ) : (
-                              <div className="flex items-center gap-1">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="p-1 h-7 w-7"
-                                  onClick={() => handleFeedback(actualIndex, 'like')}
-                                >
-                                  <ThumbsUp className="h-3.5 w-3.5" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="p-1 h-7 w-7"
-                                  onClick={() => handleFeedback(actualIndex, 'dislike')}
-                                >
-                                  <ThumbsDown className="h-3.5 w-3.5" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  className="p-1 h-7 w-7"
-                                  onClick={() => handleCopyText(message.content)}
-                                >
-                                  <Copy className="h-3.5 w-3.5" />
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        </>
-                      )}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="rounded-md flex items-center gap-1 text-sm"
+              onClick={() => handleNewChat()}
+            >
+              <MessageSquarePlus className="h-4 w-4" />
+              <span className="hidden sm:inline">New Chat</span>
+            </Button>
+          </div>
+          
+          {/* Chat area */}
+          <div className="flex-1 overflow-y-auto">
+            {!hasMessages ? (
+              <div className="grid place-items-center h-full px-4 py-6">
+                <div className="w-full grid gap-6">
+                  <div className="text-center">
+                    <div className="inline-flex mb-4 p-4 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
+                      <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M24 4L4 16L24 28L44 16L24 4Z" fill="currentColor" fillOpacity="0.8"/>
+                        <path d="M4 32L24 44L44 32M4 24L24 36L44 24" fill="currentColor" fillOpacity="0.5"/>
+                      </svg>
                     </div>
-                    
-                    {isUser && (
-                      <Avatar className="ml-3 flex-shrink-0 mt-1">
-                        <AvatarFallback className="bg-secondary text-secondary-foreground">
-                          <UserIcon className="h-5 w-5" />
-                        </AvatarFallback>
-                      </Avatar>
-                    )}
+                    <h1 className="text-xl font-bold mb-3">Welcome to HealthyAI!</h1>
+                    <p className="text-muted-foreground">
+                      Your personal health assistant, ready to help with health information and wellness tips.
+                    </p>
                   </div>
-                );
-              })}
-              
-              {isLoading && (
-                <div className="flex mb-8">
-                  <Avatar className="mr-3 flex-shrink-0 mt-1">
-                    <AvatarFallback className="bg-primary text-primary-foreground">HA</AvatarFallback>
-                  </Avatar>
-                  <div className="bg-muted p-3 rounded-lg flex items-center">
-                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                    <span>Thinking...</span>
+                
+                  <div className="grid grid-cols-2 gap-3">
+                    {SUGGESTED_FEATURES.map((feature, index) => (
+                      <div 
+                        key={index}
+                        onClick={() => handleFeatureClick(feature.title)}
+                        className="flex items-center p-3 rounded-lg border hover:bg-accent/50 cursor-pointer transition-colors"
+                      >
+                        <div className="mr-3 text-lg">{feature.icon}</div>
+                        <div className="text-sm font-medium">{feature.title}</div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )}
-              
-              <div ref={messagesEndRef} />
-            </div>
-          )}
-        </div>
-        
-        {/* Chat input */}
-        <div className="border-t p-4">
-          <div className="relative rounded-lg border">
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Type your message..."
-              className="min-h-[50px] resize-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 p-3 pr-16 py-3"
-              disabled={isLoading}
-            />
-            <div className="absolute right-2 bottom-2 flex items-center gap-2">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="rounded-full h-8 w-8"
-                disabled
-              >
-                <Mic className="h-4 w-4 text-muted-foreground" />
-              </Button>
-              <Button
-                size="icon"
-                className="rounded-full h-8 w-8"
-                onClick={() => handleSubmit(input)}
-                disabled={!input.trim() || isLoading}
-              >
-                <Send className="h-4 w-4" />
-              </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 w-full px-4 py-4">
+                {currentMessages.slice(1).map((message, index) => {
+                  const isUser = message.role === 'user';
+                  const actualIndex = index + 1; // Account for the welcome message
+                  
+                  return (
+                    <div key={index} className={`grid ${isUser ? 'justify-items-end' : 'justify-items-start'} mb-4`}>
+                      <div className={`flex w-full ${isUser ? 'flex-row-reverse' : 'flex-row'} gap-3 items-start`}>
+                        <div className="flex-shrink-0 mt-1">
+                          {isUser ? (
+                            <Avatar>
+                              <AvatarFallback className="bg-secondary text-secondary-foreground">
+                                <UserIcon className="h-5 w-5" />
+                              </AvatarFallback>
+                            </Avatar>
+                          ) : (
+                            <Avatar>
+                              <AvatarFallback className="bg-primary text-primary-foreground">HA</AvatarFallback>
+                            </Avatar>
+                          )}
+                        </div>
+                        
+                        <div className="space-y-2">
+                          {editingMessageId === `message-${actualIndex}` ? (
+                            <div className="w-full p-2 rounded-lg border bg-card/50">
+                              <Textarea
+                                value={editText}
+                                onChange={(e) => setEditText(e.target.value)}
+                                className="w-full resize-none mb-2"
+                                rows={3}
+                                autoFocus
+                              />
+                              <div className="flex justify-end gap-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => setEditingMessageId(null)}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() => saveEditedMessage(actualIndex)}
+                                >
+                                  Save & Regenerate
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className={`p-3 rounded-lg ${
+                                isUser
+                                  ? 'bg-primary/90 text-primary-foreground font-medium dark:bg-primary/80'
+                                  : 'bg-muted/80 text-foreground dark:bg-gray-800 dark:text-gray-100'
+                              }`}>
+                                {renderMessageContent(message.content)}
+                              </div>
+                              
+                              <div className="flex">
+                                {isUser ? (
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="text-xs text-primary-foreground/80 hover:text-primary-foreground dark:text-gray-300 hover:dark:text-white"
+                                    onClick={() => startEditingMessage(actualIndex, message.content)}
+                                  >
+                                    <Edit className="h-3 w-3 mr-1" />
+                                    Edit
+                                  </Button>
+                                ) : (
+                                  <div className="flex items-center gap-1.5">
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="p-1 h-7 w-7 text-gray-700 hover:text-gray-900 dark:text-gray-300 hover:dark:text-white"
+                                      onClick={() => handleFeedback(actualIndex, 'like')}
+                                    >
+                                      <ThumbsUp className="h-3.5 w-3.5" />
+                                    </Button>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="p-1 h-7 w-7 text-gray-700 hover:text-gray-900 dark:text-gray-300 hover:dark:text-white"
+                                      onClick={() => handleFeedback(actualIndex, 'dislike')}
+                                    >
+                                      <ThumbsDown className="h-3.5 w-3.5" />
+                                    </Button>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="p-1 h-7 w-7 text-gray-700 hover:text-gray-900 dark:text-gray-300 hover:dark:text-white"
+                                      onClick={() => handleCopyText(message.content)}
+                                    >
+                                      <Copy className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                
+                {isLoading && (
+                  <div className="flex gap-3 mb-4">
+                    <Avatar className="flex-shrink-0 mt-1">
+                      <AvatarFallback className="bg-primary text-primary-foreground">HA</AvatarFallback>
+                    </Avatar>
+                    <div className="bg-muted/90 p-3 rounded-lg flex items-center dark:bg-gray-800 dark:text-gray-100 font-medium">
+                      <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                      <span>Thinking...</span>
+                    </div>
+                  </div>
+                )}
+                
+                <div ref={messagesEndRef} className="h-4" />
+              </div>
+            )}
+          </div>
+          
+          {/* Chat input */}
+          <div className="border-t py-3 px-4 sticky bottom-0 bg-background/95 backdrop-blur-sm">
+            <div className="relative rounded-lg border shadow-sm w-full">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Type your message..."
+                className="min-h-[50px] resize-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 p-3 pr-12 py-3"
+                disabled={isLoading}
+              />
+              <div className="absolute right-2.5 bottom-2.5">
+                <Button
+                  size="icon"
+                  className="rounded-full h-8 w-8 shadow-sm"
+                  onClick={() => handleSubmit(input)}
+                  disabled={!input.trim() || isLoading}
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>

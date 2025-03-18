@@ -89,13 +89,13 @@ const NavItem = ({ icon, isActive, children, className, ...props }: NavItemProps
   return (
     <div
       className={cn(
-        "group flex items-center rounded-md px-3 py-2 text-sm font-medium",
+        "group flex items-center rounded-md px-2 py-1.5 text-xs font-medium",
         isActive ? "bg-accent text-accent-foreground" : "transparent hover:bg-accent hover:text-accent-foreground",
         className
       )}
       {...props}
     >
-      {icon && <div className="mr-2 h-4 w-4">{icon}</div>}
+      {icon && <div className="mr-2 h-3.5 w-3.5">{icon}</div>}
       <span className="truncate">{children}</span>
     </div>
   );
@@ -269,23 +269,40 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
 
   if (isCollapsed) {
     return (
-      <aside className="w-16 border-r bg-background flex flex-col items-center py-4">
-        <div className="flex flex-col items-center space-y-4">
-          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setIsCollapsed(false)}>
-            <PanelLeftOpen className="h-5 w-5" />
+      <aside className="w-12 flex flex-col items-center border-r bg-background h-[calc(100vh-3rem)] sticky top-12">
+        <div className="flex h-12 items-center justify-center border-b w-full">
+          <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(false)} className="h-7 w-7">
+            <PanelLeftOpen className="h-4 w-4" />
           </Button>
-          <Separator className="w-10 my-2" />
-          <Button variant="ghost" size="icon" className="rounded-full h-10 w-10" onClick={() => onNewChat()}>
-            <MessageSquarePlus className="h-5 w-5" />
+        </div>
+        <div className="flex flex-col gap-2 mt-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8" 
+            onClick={() => {
+              setIsCollapsed(false);
+              onNewChat();
+            }}
+          >
+            <MessageSquarePlus className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="rounded-full h-10 w-10">
-            <FolderPlus className="h-5 w-5" onClick={() => setCreatingFolder(true)} />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8"
+            onClick={() => {
+              setIsCollapsed(false);
+              setCreatingFolder(true);
+            }}
+          >
+            <FolderPlus className="h-4 w-4" />
           </Button>
-          <Separator className="w-10 my-2" />
+          <Separator className="w-8 my-2" />
         </div>
         <div className="mt-auto mb-4">
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <Settings className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Settings className="h-4 w-4" />
           </Button>
         </div>
       </aside>
@@ -293,46 +310,44 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
   }
 
   return (
-    <aside className="w-64 flex flex-col border-r bg-background">
-      <div className="flex h-14 items-center border-b px-4">
-        <h2 className="text-lg font-semibold tracking-tight flex-1">HealthyAI</h2>
-        <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(true)}>
-          <PanelLeftClose className="h-5 w-5" />
+    <aside className="h-[calc(100vh-3rem)] flex flex-col border-r bg-background sticky top-12">
+      <div className="flex h-12 items-center border-b px-4 py-2">
+        <h2 className="text-base font-semibold tracking-tight flex-1">HealthyAI</h2>
+        <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(true)} className="h-7 w-7">
+          <PanelLeftClose className="h-4 w-4" />
         </Button>
       </div>
       
-      <div className="px-4 py-2 flex items-center gap-2">
+      <div className="px-3 py-2.5 flex items-center gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Search..."
-            className="h-9 pr-4 pl-9"
+            className="h-8 text-xs pr-4 pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button size="sm" variant="outline" className="h-9 w-9 p-0" onClick={() => onNewChat()}>
-          <PlusCircle className="h-4 w-4" />
+        <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => onNewChat()}>
+          <PlusCircle className="h-3.5 w-3.5" />
         </Button>
       </div>
       
-      <div className="px-4 py-2">
-        <div className="flex items-center justify-between">
-          <Button 
-            variant="outline" 
-            className="w-full justify-start text-sm font-medium"
-            onClick={() => onNewChat()}
-          >
-            <MessageSquarePlus className="mr-2 h-4 w-4" />
-            New Chat
-          </Button>
-        </div>
+      <div className="px-3 py-2">
+        <Button 
+          variant="outline" 
+          className="w-full justify-start text-xs font-medium h-8"
+          onClick={() => onNewChat()}
+        >
+          <MessageSquarePlus className="mr-2 h-3.5 w-3.5" />
+          New Chat
+        </Button>
       </div>
       
       {/* Create folder UI */}
       {creatingFolder ? (
-        <div className="px-4 py-2">
+        <div className="px-4 py-2.5">
           <div className="flex gap-2 mb-2">
             <Input
               value={newFolderName}
@@ -376,7 +391,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
       
       <Separator className="my-2" />
       
-      <ScrollArea className="flex-1 px-2">
+      <ScrollArea className="flex-1 px-2 pt-1">
         {/* Folders */}
         {folders.length > 0 && (
           <div className="mb-4">
@@ -428,15 +443,15 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                   ) : (
                     <div className="group">
                       <div 
-                        className="flex items-center rounded-md px-2 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                        className="flex items-center rounded-md px-2 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer"
                         onClick={() => toggleFolder(folder.id)}
                       >
                         {expandedFolders[folder.id] ? (
-                          <ChevronDown className="h-4 w-4 mr-1 text-muted-foreground" />
+                          <ChevronDown className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
                         ) : (
-                          <ChevronRight className="h-4 w-4 mr-1 text-muted-foreground" />
+                          <ChevronRight className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
                         )}
-                        <Folder className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <Folder className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
                         <span className="flex-1 truncate">{folder.name}</span>
                         <div className="opacity-0 group-hover:opacity-100 flex">
                           <DropdownMenu>
@@ -444,7 +459,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-6 w-6"
+                                className="h-5 w-5"
                               >
                                 <Edit2 className="h-3 w-3" />
                               </Button>
@@ -524,7 +539,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                 </div>
                               ) : (
                                 <NavItem
-                                  icon={<MessageSquarePlus className="h-4 w-4" />}
+                                  icon={<MessageSquarePlus className="h-3.5 w-3.5" />}
                                   isActive={currentChatId === chat.id}
                                   className="pl-1 py-1.5 group"
                                   onClick={() => onChatSelect(chat.id)}
@@ -537,7 +552,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                                           <Button
                                             variant="ghost"
                                             size="icon"
-                                            className="h-6 w-6"
+                                            className="h-5 w-5"
                                             onClick={(e) => e.stopPropagation()}
                                           >
                                             <Edit2 className="h-3 w-3" />
@@ -590,13 +605,13 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
         {/* Chat groups */}
         {chatGroups.map((group) => (
           <div key={group.title} className="mb-2">
-            <div className="px-4 py-1">
-              <h3 className="text-xs font-medium text-muted-foreground">{group.title}</h3>
+            <div className="px-3 py-1">
+              <h3 className="text-[10px] uppercase font-medium text-muted-foreground">{group.title}</h3>
             </div>
             {group.chats.map((chat) => (
               <div key={chat.id} className="group">
                 {renamingChatId === chat.id ? (
-                  <div className="px-4 py-1">
+                  <div className="px-3 py-1">
                     <div className="flex gap-2 mb-1">
                       <Input
                         value={newChatTitle}
@@ -631,7 +646,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                   </div>
                 ) : (
                   <NavItem 
-                    icon={<MessageSquarePlus className="h-4 w-4" />}
+                    icon={<MessageSquarePlus className="h-3.5 w-3.5" />}
                     isActive={currentChatId === chat.id}
                     className="group"
                     onClick={() => onChatSelect(chat.id)}
@@ -647,7 +662,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-6 w-6"
+                              className="h-5 w-5"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <Edit2 className="h-3 w-3" />
@@ -681,33 +696,33 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
         ))}
       </ScrollArea>
       
-      <div className="mt-auto p-4 border-t">
+      <div className="mt-auto p-2 border-t">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Button 
               variant="ghost" 
               size="icon" 
-              className="rounded-full"
+              className="h-7 w-7 rounded-md"
             >
-              <Settings className="h-5 w-5" />
+              <Settings className="h-3.5 w-3.5" />
             </Button>
             <Button 
               variant="ghost" 
               size="icon" 
-              className="rounded-full"
+              className="h-7 w-7 rounded-md"
             >
-              <HelpCircle className="h-5 w-5" />
+              <HelpCircle className="h-3.5 w-3.5" />
             </Button>
           </div>
           {user ? (
             <Button 
               variant="ghost" 
               size="sm"
-              className="text-sm"
+              className="text-xs flex items-center gap-1 h-7 px-2"
               onClick={signOut}
             >
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
+              <LogOut className="h-3 w-3" />
+              <span>Logout</span>
             </Button>
           ) : (
             <AuthModal 
@@ -715,10 +730,10 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  className="text-sm"
+                  className="text-xs flex items-center gap-1 h-7 px-2"
                 >
-                  <User className="h-4 w-4 mr-2" />
-                  Sign In
+                  <User className="h-3 w-3" />
+                  <span>Sign In</span>
                 </Button>
               }
             />

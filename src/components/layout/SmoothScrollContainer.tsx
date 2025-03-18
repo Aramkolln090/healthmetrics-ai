@@ -1,4 +1,3 @@
-
 import React, { ReactNode, useEffect } from 'react';
 import { SmoothScrollProvider } from '@/contexts/SmoothScrollContext';
 import { useLocation } from 'react-router-dom';
@@ -68,8 +67,10 @@ const SmoothScrollContainer: React.FC<SmoothScrollContainerProps> = ({ children 
 
   return (
     <SmoothScrollProvider>
-      <div data-scroll-container className="relative">
-        {children}
+      <div data-scroll-container className="relative min-h-screen w-full overflow-x-hidden bg-background">
+        <div className="flex min-h-screen flex-col w-full">
+          {children}
+        </div>
         <button
           id="scroll-to-top"
           onClick={scrollToTop}
