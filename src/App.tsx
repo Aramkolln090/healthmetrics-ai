@@ -29,6 +29,8 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <Analytics />
+          <SpeedInsights />
           <BrowserRouter>
             <SmoothScrollContainer>
               <Routes>
