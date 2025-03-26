@@ -11,7 +11,9 @@ import {
   Copy, 
   Edit, 
   User as UserIcon,
-  MessageSquarePlus
+  MessageSquarePlus,
+  Settings,
+  ChevronDown
 } from "lucide-react";
 import ChatSidebar from "@/components/chat/ChatSidebar";
 import { Button } from "@/components/ui/button";
@@ -37,6 +39,10 @@ import {
 } from "@/lib/chat-service";
 import { Message as OllamaMessage, ollamaChat } from "@/lib/ollama";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 // Suggested questions for new users
 const SUGGESTED_FEATURES = [
@@ -58,6 +64,37 @@ const SUGGESTED_FEATURES = [
   }
 ];
 
+const FEATURE_CARDS = [
+  {
+    title: "Add a connection",
+    description: "Connect your data sources.",
+    icon: <MessageSquarePlus className="h-5 w-5 text-gray-500" />,
+    actionLabel: "Connect",
+    onClick: () => console.log("Add connection clicked")
+  },
+  {
+    title: "Configure connections",
+    description: "Learn how to easily connect your information sources.",
+    icon: <Settings className="h-5 w-5 text-gray-500" />,
+    actionLabel: "Watch",
+    onClick: () => console.log("Configure clicked")
+  },
+  {
+    title: "Explore Search",
+    description: "Discover how Qatalog helps you find answers instantly.",
+    icon: <MessageSquarePlus className="h-5 w-5 text-gray-500" />,
+    actionLabel: "Watch",
+    onClick: () => console.log("Explore clicked")
+  },
+  {
+    title: "Invite your team",
+    description: "Give your team instant access to Qatalog.",
+    icon: <UserIcon className="h-5 w-5 text-gray-500" />,
+    actionLabel: "Invite",
+    onClick: () => console.log("Invite clicked")
+  }
+];
+
 const ChatPage: React.FC = () => {
   const { user, isLoading: isAuthLoading } = useAuth();
   const [chats, setChats] = useState<Chat[]>([]);
@@ -72,6 +109,7 @@ const ChatPage: React.FC = () => {
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   
   const isMobile = useMediaQuery("(max-width: 1023px)");
   const isSmallScreen = useMediaQuery("(max-width: 640px)");
@@ -239,100 +277,19 @@ const ChatPage: React.FC = () => {
     setEditText("");
   };
 
-  const handleSubmit = async (text: string, isEdit: boolean = false) => {
-    if (!text.trim() || isLoading) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
     
-    const currentChat = getChatById(chats, currentChatId);
-    if (!currentChat) return;
-    
-    // If not an edit, add user message
-    if (!isEdit) {
-      const userMessage: OllamaMessage = {
-        role: "user",
-        content: text
-      };
-      
-      const updatedMessages = [...currentChat.messages, userMessage];
-      setChats(prev => updateChat(prev, currentChatId, updatedMessages));
-      setInput("");
-    }
-    
-    // Get the current messages after any updates
-    const latestChat = getChatById(
-      isEdit ? chats : updateChat(chats, currentChatId, [...currentChat.messages, { role: "user", content: text }]),
-      currentChatId
-    );
-    if (!latestChat) return;
-    
-    // If Ollama is not ready, use a fallback response
-    if (!isOllamaReady) {
-      setTimeout(() => {
-        const fallbackResponse: OllamaMessage = {
-          role: "assistant",
-          content: "I'm currently offline. Please make sure Ollama is running on your computer to get AI-powered health answers."
-        };
-        
-        setChats(prev => updateChat(
-          prev, 
-          currentChatId, 
-          [...latestChat.messages, fallbackResponse]
-        ));
-      }, 1000);
-      return;
-    }
-    
-    // Send to Ollama
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const response = await ollamaChat(latestChat.messages, {
-        model: "llama3.2",
-        temperature: 0.7,
-        maxTokens: 500,
-      });
-      
-      // Add AI response to messages
-      const assistantMessage: OllamaMessage = { 
-        role: "assistant", 
-        content: response 
-      };
-      
-      setChats(prev => updateChat(
-        prev, 
-        currentChatId, 
-        [...latestChat.messages, assistantMessage]
-      ));
-    } catch (err: any) {
-      console.error("Error in chat:", err);
-      setError(err);
-      
-      // Add error message to chat
-      const errorMessage: OllamaMessage = { 
-        role: "assistant", 
-        content: `Error: ${err.message || "Failed to communicate with Ollama"}`
-      };
-      
-      setChats(prev => updateChat(
-        prev, 
-        currentChatId, 
-        [...latestChat.messages, errorMessage]
-      ));
-      
-      toast({
-        title: "Chat Error",
-        description: err.message || "Failed to get a response from the AI",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    // Here you would handle the chat submission
+    // For now, just clear the input
+    setInput("");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(input);
+      formRef.current?.requestSubmit();
     }
   };
 
@@ -386,258 +343,107 @@ const ChatPage: React.FC = () => {
   const hasMessages = currentMessages.length > 1; // Count beyond the initial greeting
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
-      <div className="grid grid-cols-12 flex-1 relative w-full">
-        {/* Mobile sidebar button */}
-        {isMobile && (
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="lg:hidden fixed left-4 top-4 z-30"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        )}
-      
-        {/* Desktop sidebar - always visible on larger screens */}
-        <div className="hidden lg:block lg:col-span-2 xl:col-span-2">
-          <ChatSidebar 
-            chats={chats}
-            folders={folders}
-            currentChatId={currentChatId}
-            onNewChat={handleNewChat}
-            onChatSelect={handleChatSelect}
-            onDeleteChat={handleDeleteChat}
-            onRenameChat={handleRenameChat}
-            onCreateFolder={handleCreateFolder}
-            onDeleteFolder={handleDeleteFolder}
-            onRenameFolder={handleRenameFolder}
-          />
+    <div className="flex flex-col w-full h-screen bg-white">
+      {/* Header */}
+      <header className="border-b px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center">
+          <Avatar className="h-8 w-8 mr-2">
+            <AvatarFallback>AS</AvatarFallback>
+            <AvatarImage src="/avatar-placeholder.png" />
+          </Avatar>
+          <span className="font-medium">ASMobbin</span>
         </div>
-        
-        {/* Mobile sidebar using Sheet */}
-        {isMobile && (
-          <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-            <SheetContent side="left" className="p-0 w-[290px] max-w-[85vw]">
-              <div className="h-full overflow-y-auto">
-                <ChatSidebar 
-                  chats={chats}
-                  folders={folders}
-                  currentChatId={currentChatId}
-                  onNewChat={handleNewChat}
-                  onChatSelect={handleChatSelect}
-                  onDeleteChat={handleDeleteChat}
-                  onRenameChat={handleRenameChat}
-                  onCreateFolder={handleCreateFolder}
-                  onDeleteFolder={handleDeleteFolder}
-                  onRenameFolder={handleRenameFolder}
-                />
-              </div>
-            </SheetContent>
-          </Sheet>
-        )}
-        
-        {/* Main content area */}
-        <div className="col-span-12 lg:col-span-10 xl:col-span-10 flex flex-col w-full">
-          {/* Header with new chat button */}
-          <div className="flex items-center h-12 px-4 border-b sticky top-0 bg-background z-10">
-            <div className="flex-1 text-base font-semibold truncate ml-10 lg:ml-0">
-              {currentChat?.title || 'New Chat'}
-            </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="rounded-md flex items-center gap-1 text-sm"
-              onClick={() => handleNewChat()}
-            >
-              <MessageSquarePlus className="h-4 w-4" />
-              <span className="hidden sm:inline">New Chat</span>
-            </Button>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" className="text-red-500 border-red-200">
+            Connections 0
+          </Button>
+          <Button variant="outline" size="sm">
+            Invite
+          </Button>
+        </div>
+      </header>
+
+      {/* Main content */}
+      <main className="flex-1 flex flex-col items-center justify-center p-4 overflow-hidden">
+        <div className="w-full max-w-2xl mx-auto flex flex-col items-center">
+          {/* Chat logo */}
+          <div className="mb-4 rounded-full bg-gray-100 p-3">
+            <MessageSquarePlus className="h-6 w-6 text-gray-700" />
           </div>
           
-          {/* Chat area */}
-          <div className="flex-1 overflow-y-auto">
-            {!hasMessages ? (
-              <div className="grid place-items-center h-full px-4 py-6">
-                <div className="w-full grid gap-6">
-                  <div className="text-center">
-                    <div className="inline-flex mb-4 p-4 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
-                      <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M24 4L4 16L24 28L44 16L24 4Z" fill="currentColor" fillOpacity="0.8"/>
-                        <path d="M4 32L24 44L44 32M4 24L24 36L44 24" fill="currentColor" fillOpacity="0.5"/>
-                      </svg>
-                    </div>
-                    <h1 className="text-xl font-bold mb-3">Welcome to HealthyAI!</h1>
-                    <p className="text-muted-foreground">
-                      Your personal health assistant, ready to help with health information and wellness tips.
-                    </p>
-                  </div>
-                
-                  <div className="grid grid-cols-2 gap-3">
-                    {SUGGESTED_FEATURES.map((feature, index) => (
-                      <div 
-                        key={index}
-                        onClick={() => handleFeatureClick(feature.title)}
-                        className="flex items-center p-3 rounded-lg border hover:bg-accent/50 cursor-pointer transition-colors"
-                      >
-                        <div className="mr-3 text-lg">{feature.icon}</div>
-                        <div className="text-sm font-medium">{feature.title}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 w-full px-4 py-4">
-                {currentMessages.slice(1).map((message, index) => {
-                  const isUser = message.role === 'user';
-                  const actualIndex = index + 1; // Account for the welcome message
-                  
-                  return (
-                    <div key={index} className={`grid ${isUser ? 'justify-items-end' : 'justify-items-start'} mb-4`}>
-                      <div className={`flex w-full ${isUser ? 'flex-row-reverse' : 'flex-row'} gap-3 items-start`}>
-                        <div className="flex-shrink-0 mt-1">
-                          {isUser ? (
-                            <Avatar>
-                              <AvatarFallback className="bg-secondary text-secondary-foreground">
-                                <UserIcon className="h-5 w-5" />
-                              </AvatarFallback>
-                            </Avatar>
-                          ) : (
-                            <Avatar>
-                              <AvatarFallback className="bg-primary text-primary-foreground">HA</AvatarFallback>
-                            </Avatar>
-                          )}
-                        </div>
-                        
-                        <div className="space-y-2">
-                          {editingMessageId === `message-${actualIndex}` ? (
-                            <div className="w-full p-2 rounded-lg border bg-card/50">
-                              <Textarea
-                                value={editText}
-                                onChange={(e) => setEditText(e.target.value)}
-                                className="w-full resize-none mb-2"
-                                rows={3}
-                                autoFocus
-                              />
-                              <div className="flex justify-end gap-2">
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  onClick={() => setEditingMessageId(null)}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  onClick={() => saveEditedMessage(actualIndex)}
-                                >
-                                  Save & Regenerate
-                                </Button>
-                              </div>
-                            </div>
-                          ) : (
-                            <>
-                              <div className={`p-3 rounded-lg ${
-                                isUser
-                                  ? 'bg-primary/90 text-primary-foreground font-medium dark:bg-primary/80'
-                                  : 'bg-muted/80 text-foreground dark:bg-gray-800 dark:text-gray-100'
-                              }`}>
-                                {renderMessageContent(message.content)}
-                              </div>
-                              
-                              <div className="flex">
-                                {isUser ? (
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="text-xs text-primary-foreground/80 hover:text-primary-foreground dark:text-gray-300 hover:dark:text-white"
-                                    onClick={() => startEditingMessage(actualIndex, message.content)}
-                                  >
-                                    <Edit className="h-3 w-3 mr-1" />
-                                    Edit
-                                  </Button>
-                                ) : (
-                                  <div className="flex items-center gap-1.5">
-                                    <Button 
-                                      variant="ghost" 
-                                      size="sm" 
-                                      className="p-1 h-7 w-7 text-gray-700 hover:text-gray-900 dark:text-gray-300 hover:dark:text-white"
-                                      onClick={() => handleFeedback(actualIndex, 'like')}
-                                    >
-                                      <ThumbsUp className="h-3.5 w-3.5" />
-                                    </Button>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="sm" 
-                                      className="p-1 h-7 w-7 text-gray-700 hover:text-gray-900 dark:text-gray-300 hover:dark:text-white"
-                                      onClick={() => handleFeedback(actualIndex, 'dislike')}
-                                    >
-                                      <ThumbsDown className="h-3.5 w-3.5" />
-                                    </Button>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="sm" 
-                                      className="p-1 h-7 w-7 text-gray-700 hover:text-gray-900 dark:text-gray-300 hover:dark:text-white"
-                                      onClick={() => handleCopyText(message.content)}
-                                    >
-                                      <Copy className="h-3.5 w-3.5" />
-                                    </Button>
-                                  </div>
-                                )}
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-                
-                {isLoading && (
-                  <div className="flex gap-3 mb-4">
-                    <Avatar className="flex-shrink-0 mt-1">
-                      <AvatarFallback className="bg-primary text-primary-foreground">HA</AvatarFallback>
-                    </Avatar>
-                    <div className="bg-muted/90 p-3 rounded-lg flex items-center dark:bg-gray-800 dark:text-gray-100 font-medium">
-                      <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                      <span>Thinking...</span>
-                    </div>
-                  </div>
-                )}
-                
-                <div ref={messagesEndRef} className="h-4" />
-              </div>
-            )}
-          </div>
+          {/* Welcome message */}
+          <h1 className="text-xl font-medium mb-8">Hello!</h1>
           
           {/* Chat input */}
-          <div className="border-t py-3 px-4 sticky bottom-0 bg-background/95 backdrop-blur-sm">
-            <div className="relative rounded-lg border shadow-sm w-full">
-              <Textarea
+          <form ref={formRef} onSubmit={handleSubmit} className="w-full">
+            <div className="relative w-full">
+              <Textarea 
+                placeholder="How can I help?"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Type your message..."
-                className="min-h-[50px] resize-none border-none focus-visible:ring-0 focus-visible:ring-offset-0 p-3 pr-12 py-3"
-                disabled={isLoading}
+                className="w-full pr-12 min-h-[80px] rounded-lg border shadow-sm"
               />
-              <div className="absolute right-2.5 bottom-2.5">
-                <Button
-                  size="icon"
-                  className="rounded-full h-8 w-8 shadow-sm"
-                  onClick={() => handleSubmit(input)}
-                  disabled={!input.trim() || isLoading}
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button 
+                size="icon" 
+                className="absolute right-3 bottom-3 rounded"
+                type="submit"
+                disabled={!input.trim() || isLoading}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
             </div>
-          </div>
+            
+            {/* Connection dropdown */}
+            <div className="mt-4 flex justify-between items-center">
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
+                  <span className="text-sm">All connections</span>
+                  <ChevronDown className="h-4 w-4" />
+                </div>
+              </Button>
+            </div>
+          </form>
         </div>
+      </main>
+
+      {/* Feature cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 border-t bg-gray-50">
+        {FEATURE_CARDS.map((card, index) => (
+          <Card key={index} className="border shadow-sm">
+            <CardContent className="pt-6">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  {card.icon}
+                  <h3 className="font-medium">{card.title}</h3>
+                </div>
+                <p className="text-sm text-gray-500">{card.description}</p>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-sm"
+                onClick={card.onClick}
+              >
+                {card.actionLabel}
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
+
+      {/* Footer */}
+      <footer className="border-t py-4 px-6 bg-gray-900 text-white flex justify-between items-center">
+        <div className="flex items-center">
+          <MessageSquarePlus className="h-5 w-5 mr-2" />
+          <span className="font-medium">Qatalog</span>
+        </div>
+        <div className="text-sm">
+          curated by Mobbin
+        </div>
+      </footer>
     </div>
   );
 };

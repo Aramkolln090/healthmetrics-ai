@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import { SmoothScrollProvider } from '@/contexts/SmoothScrollContext';
 import { useLocation } from 'react-router-dom';
 
@@ -8,6 +8,7 @@ interface SmoothScrollContainerProps {
 
 const SmoothScrollContainer: React.FC<SmoothScrollContainerProps> = ({ children }) => {
   const location = useLocation();
+  const containerRef = useRef<HTMLDivElement>(null);
   
   // Reset scroll position when navigating to a new page
   useEffect(() => {
@@ -58,6 +59,30 @@ const SmoothScrollContainer: React.FC<SmoothScrollContainerProps> = ({ children 
     return () => document.removeEventListener('click', handleAnchorClick);
   }, []);
 
+  // Prevent scrolling beyond footer
+  useEffect(() => {
+    const preventOverscroll = () => {
+      if (containerRef.current) {
+        const footer = document.querySelector('footer');
+        if (footer) {
+          // Set max-height for the content area to prevent scrolling beyond the footer
+          const windowHeight = window.innerHeight;
+          const footerHeight = footer.getBoundingClientRect().height;
+          const mainContent = containerRef.current.querySelector('.main-content') as HTMLElement;
+          
+          if (mainContent) {
+            const maxHeight = `calc(100vh - ${footerHeight}px)`;
+            document.documentElement.style.setProperty('--main-content-max-height', maxHeight);
+          }
+        }
+      }
+    };
+
+    preventOverscroll();
+    window.addEventListener('resize', preventOverscroll);
+    return () => window.removeEventListener('resize', preventOverscroll);
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -67,8 +92,12 @@ const SmoothScrollContainer: React.FC<SmoothScrollContainerProps> = ({ children 
 
   return (
     <SmoothScrollProvider>
-      <div data-scroll-container className="relative min-h-screen w-full overflow-x-hidden bg-background">
-        <div className="flex min-h-screen flex-col w-full">
+      <div 
+        ref={containerRef}
+        data-scroll-container 
+        className="relative min-h-screen w-full overflow-x-hidden bg-background flex flex-col"
+      >
+        <div className="main-content flex-grow overflow-y-auto">
           {children}
         </div>
         <button

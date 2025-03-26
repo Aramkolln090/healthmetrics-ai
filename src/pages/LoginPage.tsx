@@ -4,7 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SignInForm } from '@/components/auth/SignInForm';
 import { SignUpForm } from '@/components/auth/SignUpForm';
 import { useAuth } from '@/contexts/AuthContext';
-
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();

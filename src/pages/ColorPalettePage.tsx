@@ -4,6 +4,9 @@ import { ColorPaletteShowcase } from "@/components/ui/color-palette-showcase";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 
 const ColorPalettePage = () => {
   const { theme, setTheme } = useTheme();

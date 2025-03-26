@@ -7,6 +7,9 @@ import { FeatureSection } from "@/components/features/FeatureSection";
 import AIPreview from "@/components/ai/AIPreview";
 import MetricsPreview from "@/components/metrics/MetricsPreview";
 import DisplayCards from "@/components/ui/display-cards";
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 import { 
   Brain, 
   Activity, 
@@ -33,32 +36,47 @@ const Index = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Make content area have a max-height to prevent scrolling beyond footer
+  useEffect(() => {
+    const setContentHeight = () => {
+      const footer = document.querySelector('footer');
+      if (footer) {
+        const footerHeight = footer.offsetHeight;
+        document.documentElement.style.setProperty('--footer-height', `${footerHeight}px`);
+      }
+    };
+    
+    setContentHeight();
+    window.addEventListener('resize', setContentHeight);
+    return () => window.removeEventListener('resize', setContentHeight);
+  }, []);
+
   const medicationCards = [
     {
-      icon: <Pill className="size-4 text-red-300" />,
+      icon: <Pill className="size-4 text-healthStatus-alert" />,
       title: "Medication Alert",
       description: "Time to take Lisinopril",
       date: "Just now",
-      iconClassName: "text-red-500",
-      titleClassName: "text-red-500",
+      iconClassName: "text-healthStatus-alert",
+      titleClassName: "text-healthStatus-alert",
       className: "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
     },
     {
-      icon: <Clock className="size-4 text-blue-300" />,
+      icon: <Clock className="size-4 text-primary" />,
       title: "Reminder",
       description: "Blood Pressure Check Due",
       date: "30 mins ago",
-      iconClassName: "text-blue-500",
-      titleClassName: "text-blue-500",
+      iconClassName: "text-primary",
+      titleClassName: "text-primary",
       className: "[grid-area:stack] translate-x-16 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
     },
     {
-      icon: <CalendarDays className="size-4 text-green-300" />,
+      icon: <CalendarDays className="size-4 text-secondary" />,
       title: "Upcoming",
       description: "Doctor Appointment Tomorrow",
       date: "Today",
-      iconClassName: "text-green-500",
-      titleClassName: "text-green-500",
+      iconClassName: "text-secondary",
+      titleClassName: "text-secondary",
       className: "[grid-area:stack] translate-x-32 translate-y-20 hover:translate-y-10",
     },
   ];
@@ -98,9 +116,12 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen">
-      <Navbar1 />
-      <div className="pt-24">
+    <div className="min-h-screen overflow-x-hidden">
+      <div className="fixed top-0 left-0 w-full z-50">
+        <Navbar1 />
+      </div>
+
+      <div className="pt-24 max-h-[calc(100vh-var(--footer-height,80px))] overflow-y-auto">
         <HeroSection />
         
         {/* New Animated Feature Section */}
@@ -108,7 +129,7 @@ const Index = () => {
           steps={featureSteps}
           title="Take control of your health"
           subtitle="Our platform makes it easy to monitor, understand, and improve your health with these simple steps"
-          className="bg-gradient-to-b from-white to-blue-50/50"
+          className="bg-gradient-to-b from-white to-accent/30 dark:from-card dark:to-background"
         />
         
         <section id="features" className="py-24 px-4 relative">
@@ -163,7 +184,7 @@ const Index = () => {
           </div>
         </section>
         
-        <section id="reminders" className="py-24 px-4 bg-gradient-to-b from-blue-50/50 to-white">
+        <section id="reminders" className="py-24 px-4 bg-gradient-to-b from-accent/30 to-white dark:from-background dark:to-card">
           <div className="container mx-auto text-center mb-16">
             <span className="text-sm font-medium text-primary">Reminders</span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
@@ -191,7 +212,7 @@ const Index = () => {
           </div>
         </section>
         
-        <section id="metrics" className="py-24 px-4 bg-gradient-to-b from-white to-blue-50">
+        <section id="metrics" className="py-24 px-4 bg-gradient-to-b from-white to-accent/30 dark:from-card dark:to-background">
           <div className="container mx-auto text-center mb-16">
             <span className="text-sm font-medium text-primary">Metrics</span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
@@ -232,7 +253,7 @@ const Index = () => {
           <div className="mt-12 text-center">
             <Button 
               onClick={() => navigate('/chat')} 
-              className="rounded-full px-8 py-6 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-md transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+              className="rounded-full px-8 py-6 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white shadow-md transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
             >
               Talk to Your AI Assistant
             </Button>
@@ -248,20 +269,18 @@ const Index = () => {
                   Your complete health companion
                 </p>
               </div>
-              <div className="flex space-x-6">
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
-                  Privacy
-                </a>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
-                  Terms
-                </a>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
-                  Contact
-                </a>
+              <div className="flex flex-wrap gap-6 justify-center">
+                <a href="#" className="text-sm text-muted-foreground hover:text-primary hover-underline">About</a>
+                <a href="#" className="text-sm text-muted-foreground hover:text-primary hover-underline">Features</a>
+                <a href="#" className="text-sm text-muted-foreground hover:text-primary hover-underline">Pricing</a>
+                <a href="#" className="text-sm text-muted-foreground hover:text-primary hover-underline">Blog</a>
+                <a href="#" className="text-sm text-muted-foreground hover:text-primary hover-underline">Contact</a>
               </div>
-            </div>
-            <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-              <p>© {new Date().getFullYear()} HealthyAI. All rights reserved.</p>
+              <div className="mt-6 md:mt-0">
+                <p className="text-sm text-muted-foreground">
+                  &copy; {new Date().getFullYear()} HealthyAI. All rights reserved.
+                </p>
+              </div>
             </div>
           </div>
         </footer>

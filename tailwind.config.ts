@@ -53,26 +53,33 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
-				// Blue palette from image
+				// Updated Health-focused teal palette
 				healthBlue: {
-					950: '#021024', // Very dark navy blue
-					900: '#052659', // Deep navy blue
-					700: '#5483B3', // Medium blue
-					500: '#7DA0CA', // Light blue
-					200: '#C1E8FF', // Very light blue
+					950: '#0f1423', // Very dark navy
+					900: '#1e2846', // Deep navy blue
+					700: '#0d9ddb', // Teal blue
+					500: '#16c2a3', // Mint green
+					200: '#e6f7ff', // Very light teal
+				},
+				// Add health status colors
+				healthStatus: {
+					normal: 'hsl(var(--health-normal))',
+					caution: 'hsl(var(--health-caution))',
+					warning: 'hsl(var(--health-warning))',
+					alert: 'hsl(var(--health-alert))',
 				},
 				health: {
-					50: '#f5f7fa',
-					100: '#ebeef3',
-					200: '#d9dfe8',
-					300: '#b9c5d6',
-					400: '#94a3be',
-					500: '#7686a6',
-					600: '#616d8a',
-					700: '#4d5572',
-					800: '#3e4559',
-					900: '#2d3242',
-					950: '#1f2331',
+					50: '#f5fafd',
+					100: '#eaf6fc',
+					200: '#d0ebf7',
+					300: '#a5d8ef',
+					400: '#60b6e0',
+					500: '#3498db',
+					600: '#1d7ab8',
+					700: '#1a6396',
+					800: '#1a557d',
+					900: '#1a4768',
+					950: '#0f2d45',
 				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',

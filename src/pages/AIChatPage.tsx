@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "@/components/layout/Navbar";
+import PageLayout from "@/components/layout/PageLayout";
 import { SharedSidebar } from "@/components/ui/shared-sidebar";
 import { HealthChatInterface } from "@/components/ai/HealthChatInterface";
 import { HealthKnowledgeBase } from "@/components/ai/HealthKnowledgeBase";
-import { Loader2, MessageSquare, BookOpen } from "lucide-react";
+import { Loader2, MessageSquare, BookOpen, Home, Settings, Calendar, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { pullHealthModel } from "@/lib/ollama";
 import { toast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 
 const AIChatPage = () => {
+  const navigate = useNavigate();
   const [isCheckingOllama, setIsCheckingOllama] = useState(true);
   const [isOllamaReady, setIsOllamaReady] = useState(false);
   const [isPullingModel, setIsPullingModel] = useState(false);
@@ -77,21 +82,32 @@ const AIChatPage = () => {
     }
   };
 
+  const getSidebarItems = () => {
+    return [
+      { icon: <Home className="h-5 w-5" />, label: 'Dashboard', onClick: () => navigate('/') },
+      { icon: <Brain className="h-5 w-5" />, label: 'AI Chat', onClick: () => navigate('/ai-health') },
+      { icon: <Calendar className="h-5 w-5" />, label: 'Calendar', onClick: () => navigate('/calendar') },
+      { icon: <Settings className="h-5 w-5" />, label: 'Settings', onClick: () => navigate('/settings') },
+    ];
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <div className="flex pt-16">
-        <SharedSidebar />
-        <main className="flex-1 md:ml-64 p-6">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl font-bold mb-2 text-healthBlue-950 dark:text-healthBlue-200">Health AI Assistant</h1>
+    <PageLayout>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="md:col-span-1">
+          <SharedSidebar items={getSidebarItems()} />
+        </div>
+          
+        <div className="md:col-span-3">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold mb-2">Health AI Assistant</h1>
             <p className="text-muted-foreground mb-6">
               Ask health questions and manage your health knowledge base
             </p>
             
             {isCheckingOllama ? (
-              <div className="p-8 text-center">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-healthBlue-700" />
+              <div className="p-8 text-center health-card">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
                 <p>Checking Ollama service...</p>
               </div>
             ) : !isOllamaReady ? (
@@ -101,7 +117,7 @@ const AIChatPage = () => {
                   To use the Health AI Assistant, you need to have Ollama running on your local machine.
                 </p>
                 {connectionError && (
-                  <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md text-sm text-red-800 dark:text-red-300">
+                  <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md text-sm text-destructive">
                     <p className="font-semibold">Error details:</p>
                     <p className="font-mono text-xs mt-1">{connectionError}</p>
                   </div>
@@ -110,10 +126,10 @@ const AIChatPage = () => {
                   <div className="bg-muted p-4 rounded-md text-sm text-left">
                     <p className="font-medium mb-2">Follow these steps:</p>
                     <ol className="list-decimal pl-5 space-y-2">
-                      <li>Download and install Ollama from <a href="https://ollama.ai/download" target="_blank" rel="noopener noreferrer" className="text-healthBlue-700 hover:underline">https://ollama.ai/download</a></li>
+                      <li>Download and install Ollama from <a href="https://ollama.ai/download" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">https://ollama.ai/download</a></li>
                       <li>Launch the Ollama application</li>
-                      <li>Verify Ollama is running with: <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">ollama list</code></li>
-                      <li>Make sure you have the llama3.2 model: <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">ollama pull llama3.2</code></li>
+                      <li>Verify Ollama is running with: <code className="bg-muted-foreground/20 dark:bg-muted-foreground/10 px-1 rounded">ollama list</code></li>
+                      <li>Make sure you have the llama3.2 model: <code className="bg-muted-foreground/20 dark:bg-muted-foreground/10 px-1 rounded">ollama pull llama3.2</code></li>
                       <li>Once running, refresh this page</li>
                     </ol>
                   </div>
@@ -147,7 +163,7 @@ const AIChatPage = () => {
                     <Button
                       variant="link"
                       onClick={() => setActiveTab("knowledge")}
-                      className="text-healthBlue-700 dark:text-healthBlue-500"
+                      className="text-primary"
                     >
                       <BookOpen className="h-4 w-4 mr-2" />
                       Access Knowledge Base
@@ -185,9 +201,9 @@ const AIChatPage = () => {
               </div>
             )}
           </div>
-        </main>
+        </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

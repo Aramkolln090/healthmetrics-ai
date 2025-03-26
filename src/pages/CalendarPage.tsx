@@ -23,6 +23,9 @@ import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FullscreenCalendar } from "@/components/calendar/FullscreenCalendar";
 import { SharedSidebar } from "@/components/ui/shared-sidebar";
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 
 // Icons for each metric type
 const metricIcons = {

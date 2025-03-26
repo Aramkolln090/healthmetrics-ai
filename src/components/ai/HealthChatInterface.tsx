@@ -81,11 +81,11 @@ export function HealthChatInterface() {
   };
 
   return (
-    <div className="flex flex-col h-[80vh] border rounded-lg bg-card shadow-sm">
+    <div className="flex flex-col h-[80vh] border rounded-lg bg-card shadow-sm health-card">
       {/* Chat header */}
       <div className="p-4 border-b flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Bot className="h-5 w-5 text-healthBlue-700 dark:text-healthBlue-500" />
+          <Bot className="h-5 w-5 text-primary" />
           <h2 className="font-semibold text-lg">Health Assistant</h2>
         </div>
         <div className="flex items-center space-x-2">
@@ -145,7 +145,7 @@ export function HealthChatInterface() {
               general wellness, or understanding medical terms.
             </p>
             {isUsingKnowledgeBase && (
-              <div className="mt-4 flex items-center text-healthBlue-700 dark:text-healthBlue-500 text-xs gap-1">
+              <div className="mt-4 flex items-center text-primary text-xs gap-1">
                 <Database className="h-3 w-3" />
                 <span>Knowledge base is active</span>
               </div>
@@ -163,8 +163,8 @@ export function HealthChatInterface() {
                 <div
                   className={`max-w-[80%] px-4 py-3 rounded-lg ${
                     message.role === "user"
-                      ? "bg-healthBlue-700 text-white dark:bg-healthBlue-700"
-                      : "bg-muted"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground border border-border"
                   }`}
                 >
                   {renderMessageContent(message.content)}
@@ -173,8 +173,8 @@ export function HealthChatInterface() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="max-w-[80%] px-4 py-3 rounded-lg bg-muted flex items-center space-x-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                <div className="max-w-[80%] px-4 py-3 rounded-lg bg-muted border border-border flex items-center space-x-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   <p>Thinking...</p>
                 </div>
               </div>
@@ -209,7 +209,7 @@ export function HealthChatInterface() {
           <Button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="self-end bg-healthBlue-700 hover:bg-healthBlue-900 text-white"
+            className="self-end bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />

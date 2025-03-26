@@ -6,7 +6,8 @@ import { Loader2 } from "lucide-react";
 import SimpleOllamaChat from '@/components/ai/SimpleOllamaChat';
 import DirectOllamaChat from '@/components/ai/DirectOllamaChat';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 const OllamaTestPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(null);

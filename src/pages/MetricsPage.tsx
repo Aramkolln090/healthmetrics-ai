@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import Navbar from "@/components/layout/Navbar";
+import PageLayout from "@/components/layout/PageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { 
   Activity, 
   Heart, 
@@ -135,38 +137,38 @@ const MetricsPage = () => {
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="colorSystolic" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#8884d8" stopOpacity={0.2}/>
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
                 </linearGradient>
                 <linearGradient id="colorDiastolic" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#82ca9d" stopOpacity={0.2}/>
+                  <stop offset="5%" stopColor="hsl(var(--secondary))" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="hsl(var(--secondary))" stopOpacity={0.2}/>
                 </linearGradient>
               </defs>
               <XAxis dataKey="date" />
               <YAxis />
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <Tooltip 
-                contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                contentStyle={{ backgroundColor: 'hsl(var(--card))', color: 'hsl(var(--card-foreground))', borderRadius: '8px', border: '1px solid hsl(var(--border))' }}
                 formatter={(value, name) => [`${value} mmHg`, name === 'systolic' ? 'Systolic' : 'Diastolic']}
                 labelFormatter={(label) => `Date: ${label}`}
               />
-              <Area type="monotone" dataKey="systolic" stroke="#8884d8" fillOpacity={1} fill="url(#colorSystolic)" name="Systolic" />
-              <Area type="monotone" dataKey="diastolic" stroke="#82ca9d" fillOpacity={1} fill="url(#colorDiastolic)" name="Diastolic" />
+              <Area type="monotone" dataKey="systolic" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#colorSystolic)" name="Systolic" />
+              <Area type="monotone" dataKey="diastolic" stroke="hsl(var(--secondary))" fillOpacity={1} fill="url(#colorDiastolic)" name="Diastolic" />
             </AreaChart>
           ) : (
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.2}/>
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
                 </linearGradient>
               </defs>
               <XAxis dataKey="date" />
               <YAxis />
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <Tooltip 
-                contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                contentStyle={{ backgroundColor: 'hsl(var(--card))', color: 'hsl(var(--card-foreground))', borderRadius: '8px', border: '1px solid hsl(var(--border))' }}
                 formatter={(value) => [
                   `${value} ${activeTab === 'glucose' ? 'mg/dL' : activeTab === 'heart_rate' ? 'bpm' : ''}`,
                   activeTab === 'glucose' ? 'Glucose' : activeTab === 'heart_rate' ? 'Heart Rate' : activeTab
@@ -176,7 +178,7 @@ const MetricsPage = () => {
               <Area 
                 type="monotone" 
                 dataKey="value" 
-                stroke="#3b82f6" 
+                stroke="hsl(var(--primary))" 
                 fillOpacity={1} 
                 fill="url(#colorValue)" 
                 name={activeTab === 'glucose' ? 'Glucose' : activeTab === 'heart_rate' ? 'Heart Rate' : activeTab}
@@ -191,11 +193,11 @@ const MetricsPage = () => {
   const getMetricCardIcon = (type: MetricType) => {
     switch (type) {
       case 'blood_pressure':
-        return <Heart className="h-5 w-5 text-red-500" />;
+        return <Heart className="h-5 w-5 text-healthStatus-alert" />;
       case 'glucose':
-        return <Droplets className="h-5 w-5 text-blue-500" />;
+        return <Droplets className="h-5 w-5 text-primary" />;
       case 'heart_rate':
-        return <Activity className="h-5 w-5 text-purple-500" />;
+        return <Activity className="h-5 w-5 text-healthStatus-warning" />;
       default:
         return <Activity className="h-5 w-5" />;
     }
@@ -237,10 +239,12 @@ const MetricsPage = () => {
         const systolic = (latestMetric.value as any).systolic;
         const diastolic = (latestMetric.value as any).diastolic;
         const bpStatus = systolic < 120 && diastolic < 80 
-          ? { label: 'Normal', color: 'bg-green-500' }
+          ? { label: 'Normal', color: 'health-badge-normal' }
           : systolic < 130 && diastolic < 85
-          ? { label: 'Elevated', color: 'bg-yellow-500' }
-          : { label: 'High', color: 'bg-red-500' };
+          ? { label: 'Elevated', color: 'health-badge-caution' }
+          : systolic < 140 && diastolic < 90
+          ? { label: 'Borderline', color: 'health-badge-warning' }
+          : { label: 'High', color: 'health-badge-alert' };
 
         return {
           value: `${systolic}/${diastolic}`,
@@ -248,479 +252,354 @@ const MetricsPage = () => {
           status: bpStatus,
           progress: Math.min(100, (systolic / 160) * 100)
         };
-        
+      
       case 'glucose':
-        const glucose = (latestMetric.value as any).level;
-        const glucoseStatus = glucose < 100 
-          ? { label: 'Normal', color: 'bg-green-500' }
-          : glucose < 125
-          ? { label: 'Pre-diabetic', color: 'bg-yellow-500' }
-          : { label: 'Diabetic', color: 'bg-red-500' };
+        const glucoseLevel = (latestMetric.value as any).level;
+        // Fasting glucose levels
+        const glucoseStatus = glucoseLevel < 70
+          ? { label: 'Low', color: 'health-badge-alert' }
+          : glucoseLevel <= 99
+          ? { label: 'Normal', color: 'health-badge-normal' }
+          : glucoseLevel <= 125
+          ? { label: 'Elevated', color: 'health-badge-caution' }
+          : { label: 'High', color: 'health-badge-alert' };
 
         return {
-          value: glucose,
-          unit: (latestMetric.value as any).unit || 'mg/dL',
+          value: glucoseLevel,
+          unit: 'mg/dL',
           status: glucoseStatus,
-          progress: Math.min(100, (glucose / 200) * 100)
+          progress: Math.min(100, (glucoseLevel / 200) * 100)
         };
         
       case 'heart_rate':
-        const heartRate = (latestMetric.value as any).bpm;
-        const hrStatus = heartRate < 60 
-          ? { label: 'Low', color: 'bg-blue-500' }
-          : heartRate <= 100
-          ? { label: 'Normal', color: 'bg-green-500' }
-          : { label: 'Elevated', color: 'bg-red-500' };
+        const bpm = (latestMetric.value as any).bpm;
+        // Resting heart rate for adults
+        const heartStatus = bpm < 60
+          ? { label: 'Low', color: 'health-badge-caution' }
+          : bpm <= 100
+          ? { label: 'Normal', color: 'health-badge-normal' }
+          : bpm <= 120
+          ? { label: 'Elevated', color: 'health-badge-warning' }
+          : { label: 'High', color: 'health-badge-alert' };
 
         return {
-          value: heartRate,
+          value: bpm,
           unit: 'bpm',
-          status: hrStatus,
-          progress: Math.min(100, (heartRate / 150) * 100)
+          status: heartStatus,
+          progress: Math.min(100, (bpm / 150) * 100)
         };
-        
+      
       default:
         return null;
     }
   };
 
-  if (isAuthLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-center">
-          <div className="h-12 w-12 mx-auto mb-4 rounded-full bg-blue-100"></div>
-          <div className="h-4 w-32 mx-auto rounded bg-blue-100"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user || !session) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-24">
-          <div className="max-w-md mx-auto text-center">
-            <AlertCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Authentication Required</h2>
-            <p className="text-muted-foreground mb-6">Please sign in to view your health metrics</p>
-            <Button asChild>
-              <a href="/">Go to Homepage</a>
-            </Button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  const summary = getMetricSummary();
-
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <div className="flex pt-16">
-        {/* Use the shared sidebar component */}
-        <SharedSidebar />
+    <PageLayout>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="md:col-span-1">
+          <SharedSidebar items={getSidebarItems()} />
+        </div>
         
-        {/* Main Content */}
-        <div className="flex-1 md:ml-64 p-6">
-          {activeView === 'dashboard' ? (
-            <>
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Health Dashboard</h1>
-                <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Plus className="mr-2 h-4 w-4" /> Add Reading
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogTitle>Add New Health Reading</DialogTitle>
-                    <DialogDescription>
-                      Enter the details for your new health metric reading.
-                    </DialogDescription>
-                    <MetricForm 
-                      type={activeTab}
-                      onSuccess={() => {
-                        setShowAddForm(false);
-                        fetchMetrics();
-                      }}
-                      onCancel={() => setShowAddForm(false)}
-                    />
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              {/* Metrics Summary Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm text-muted-foreground font-medium">
-                      <div className="flex items-center">
-                        <Heart className="mr-2 h-4 w-4 text-red-500" />
-                        Blood Pressure
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {bloodPressureMetrics.length > 0 ? (
-                      <>
-                        <div className="flex items-end mb-2">
-                          <span className="text-3xl font-bold">
-                            {(bloodPressureMetrics[0].value as any).systolic}/
-                            {(bloodPressureMetrics[0].value as any).diastolic}
-                          </span>
-                          <span className="text-sm text-muted-foreground ml-1 mb-1">mmHg</span>
-                        </div>
-                        <div className="flex items-center mb-1">
-                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-100">
-                            Latest Reading
-                          </Badge>
-                          <span className="text-xs text-muted-foreground ml-2">
-                            {format(new Date(bloodPressureMetrics[0].recorded_at), 'MMM dd, HH:mm')}
-                          </span>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="text-center py-4">
-                        <p className="text-muted-foreground text-sm">No data</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm text-muted-foreground font-medium">
-                      <div className="flex items-center">
-                        <Droplets className="mr-2 h-4 w-4 text-blue-500" />
-                        Glucose
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {glucoseMetrics.length > 0 ? (
-                      <>
-                        <div className="flex items-end mb-2">
-                          <span className="text-3xl font-bold">
-                            {(glucoseMetrics[0].value as any).level}
-                          </span>
-                          <span className="text-sm text-muted-foreground ml-1 mb-1">
-                            {(glucoseMetrics[0].value as any).unit || 'mg/dL'}
-                          </span>
-                        </div>
-                        <div className="flex items-center mb-1">
-                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-100">
-                            Latest Reading
-                          </Badge>
-                          <span className="text-xs text-muted-foreground ml-2">
-                            {format(new Date(glucoseMetrics[0].recorded_at), 'MMM dd, HH:mm')}
-                          </span>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="text-center py-4">
-                        <p className="text-muted-foreground text-sm">No data</p>
-                      </div>
-                    )}
-                </CardContent>
-              </Card>
-              
-              <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm text-muted-foreground font-medium">
-                      <div className="flex items-center">
-                        <Activity className="mr-2 h-4 w-4 text-purple-500" />
-                        Heart Rate
-                      </div>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {heartRateMetrics.length > 0 ? (
-                      <>
-                        <div className="flex items-end mb-2">
-                          <span className="text-3xl font-bold">
-                            {(heartRateMetrics[0].value as any).bpm}
-                          </span>
-                          <span className="text-sm text-muted-foreground ml-1 mb-1">bpm</span>
-                    </div>
-                        <div className="flex items-center mb-1">
-                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-100">
-                            Latest Reading
-                          </Badge>
-                          <span className="text-xs text-muted-foreground ml-2">
-                            {format(new Date(heartRateMetrics[0].recorded_at), 'MMM dd, HH:mm')}
-                          </span>
-                    </div>
-                      </>
-                    ) : (
-                      <div className="text-center py-4">
-                        <p className="text-muted-foreground text-sm">No data</p>
-                    </div>
-                    )}
-                  </CardContent>
-                </Card>
-                    </div>
-
-              {/* Metrics Chart */}
-              <div className="grid grid-cols-1 gap-6 mb-6">
-                <Card>
-                  <CardHeader>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <CardTitle>Trend Analysis</CardTitle>
-                        <CardDescription>View your health metrics over time</CardDescription>
-                      </div>
-                      <Tabs defaultValue={activeTab} onValueChange={(value) => setActiveTab(value as MetricType)}>
-                        <TabsList>
-                          <TabsTrigger value="blood_pressure">
-                            <Heart className="mr-2 h-4 w-4" />
-                            Blood Pressure
-                          </TabsTrigger>
-                          <TabsTrigger value="glucose">
-                            <Droplets className="mr-2 h-4 w-4" />
-                            Glucose
-                          </TabsTrigger>
-                          <TabsTrigger value="heart_rate">
-                            <Activity className="mr-2 h-4 w-4" />
-                            Heart Rate
-                          </TabsTrigger>
-                        </TabsList>
-                      </Tabs>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {isLoading ? (
-                      <div className="flex justify-center items-center h-[300px]">
-                        <div className="animate-pulse text-center">
-                          <div className="h-4 w-32 mx-auto rounded bg-blue-100"></div>
-                        </div>
-                      </div>
-                    ) : metrics.length > 0 ? (
-                      renderChart()
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-[300px] text-center">
-                        <p className="text-muted-foreground mb-4">No data available for {activeTab.replace('_', ' ')}</p>
-                        <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-                          <DialogTrigger asChild>
-                            <Button onClick={() => setShowAddForm(true)}>
-                              <Plus className="mr-2 h-4 w-4" /> Add Your First Reading
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogTitle>Add Your First Health Reading</DialogTitle>
-                            <DialogDescription>
-                              Start tracking your health by adding your first metric reading.
-                            </DialogDescription>
-                            <MetricForm 
-                              type={activeTab}
-                              onSuccess={() => {
-                                setShowAddForm(false);
-                                fetchMetrics();
-                              }}
-                              onCancel={() => setShowAddForm(false)}
-                            />
-                          </DialogContent>
-                        </Dialog>
-                  </div>
-                    )}
-                </CardContent>
-              </Card>
-            </div>
+        <div className="md:col-span-3">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold mb-2">Health Metrics</h1>
+            <p className="text-muted-foreground">
+              Track and monitor your health metrics over time.
+            </p>
+          </div>
           
-              {/* Recent Activity */}
-              <div className="grid grid-cols-1 gap-6">
-            <Card>
-                  <CardHeader>
-                    <CardTitle>Recent Activity</CardTitle>
-                    <CardDescription>Your most recent health readings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                    {recentEntries.length > 0 ? (
-                      <div className="space-y-4">
-                        {recentEntries.map((entry, idx) => (
-                          <div key={idx} className="flex items-center justify-between border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-                            <div className="flex items-center">
-                              <div className="mr-3 p-2 rounded-full bg-primary/10">
-                                {getMetricCardIcon(entry.type)}
-                            </div>
-                            <div>
-                                <p className="font-medium">{formatMetricType(entry.type)}</p>
-                              <p className="text-sm text-muted-foreground">
-                                  {format(new Date(entry.recorded_at), 'MMM dd, yyyy HH:mm')}
-                              </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center">
-                              <div className="text-right">
-                                <p className="font-bold">{getMetricValue(entry)}</p>
-                                {entry.notes && <p className="text-xs text-muted-foreground">Note: {entry.notes}</p>}
-                          </div>
-                              <ChevronRight className="ml-2 h-4 w-4 text-muted-foreground" />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center py-8 text-center">
-                        <p className="text-muted-foreground mb-4">No recent activity</p>
-                        <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-                          <DialogTrigger asChild>
-                            <Button onClick={() => setShowAddForm(true)}>
-                              <Plus className="mr-2 h-4 w-4" /> Add Your First Reading
-                            </Button>
-                          </DialogTrigger>
-                        </Dialog>
-                      </div>
-                    )}
-                        </CardContent>
-                      </Card>
-              </div>
-            </>
-          ) : (
-            // History View
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Metrics History</h1>
-                <Tabs defaultValue={activeTab} onValueChange={(value) => setActiveTab(value as MetricType)}>
-                  <TabsList>
-                    <TabsTrigger value="blood_pressure">
-                      <Heart className="mr-2 h-4 w-4" />
-                      Blood Pressure
+          {activeView === 'dashboard' ? (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <Tabs
+                  value={activeTab}
+                  onValueChange={(value) => setActiveTab(value as MetricType)}
+                  className="w-full"
+                >
+                  <TabsList className="grid grid-cols-3 mb-4">
+                    <TabsTrigger value="blood_pressure" className="flex gap-2 items-center">
+                      <Heart className="h-4 w-4" />
+                      <span className="hidden sm:inline">Blood Pressure</span>
+                      <span className="sm:hidden">BP</span>
                     </TabsTrigger>
-                    <TabsTrigger value="glucose">
-                      <Droplets className="mr-2 h-4 w-4" />
-                      Glucose
+                    <TabsTrigger value="glucose" className="flex gap-2 items-center">
+                      <Droplets className="h-4 w-4" />
+                      <span className="hidden sm:inline">Glucose</span>
+                      <span className="sm:hidden">GL</span>
                     </TabsTrigger>
-                    <TabsTrigger value="heart_rate">
-                      <Activity className="mr-2 h-4 w-4" />
-                      Heart Rate
+                    <TabsTrigger value="heart_rate" className="flex gap-2 items-center">
+                      <Activity className="h-4 w-4" />
+                      <span className="hidden sm:inline">Heart Rate</span>
+                      <span className="sm:hidden">HR</span>
                     </TabsTrigger>
                   </TabsList>
-                </Tabs>
-              </div>
-              
-              <Card>
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <CardTitle>{formatMetricType(activeTab)} History</CardTitle>
-                      <CardDescription>All your recorded {activeTab.replace('_', ' ')} readings</CardDescription>
-                    </div>
+
+                  <TabsContent value={activeTab} className="space-y-6">
                     <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
                       <DialogTrigger asChild>
-                        <Button size="sm">
+                        <Button className="mb-4">
                           <Plus className="mr-2 h-4 w-4" /> Add Reading
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
-                        <DialogTitle>Add New Health Reading</DialogTitle>
+                        <DialogTitle>Add {formatMetricType(activeTab)} Reading</DialogTitle>
                         <DialogDescription>
-                          Enter the details for your new health metric reading.
+                          Enter your latest {formatMetricType(activeTab.toLowerCase())} measurement.
                         </DialogDescription>
-                        <MetricForm 
+                        <MetricForm
                           type={activeTab}
                           onSuccess={() => {
                             setShowAddForm(false);
                             fetchMetrics();
                           }}
-                          onCancel={() => setShowAddForm(false)}
                         />
                       </DialogContent>
                     </Dialog>
-                  </div>
-              </CardHeader>
-              <CardContent>
-                  {isLoading ? (
-                    <div className="flex justify-center items-center h-20">
-                      <div className="animate-pulse text-center">
-                        <div className="h-4 w-32 mx-auto rounded bg-blue-100"></div>
+                    
+                    {isLoading ? (
+                      <div className="flex justify-center p-8">
+                        <div className="animate-pulse h-4 w-4 bg-primary rounded-full"></div>
+                        <div className="animate-pulse h-4 w-4 bg-primary rounded-full ml-1" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="animate-pulse h-4 w-4 bg-primary rounded-full ml-1" style={{ animationDelay: '0.4s' }}></div>
                       </div>
-                </div>
-                  ) : metrics.length > 0 ? (
-                    <div className="space-y-4">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b">
-                            <th className="py-3 text-left font-medium text-muted-foreground">Date & Time</th>
-                            <th className="py-3 text-left font-medium text-muted-foreground">Reading</th>
-                            <th className="py-3 text-left font-medium text-muted-foreground">Status</th>
-                            <th className="py-3 text-left font-medium text-muted-foreground">Notes</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {metrics.map((metric, idx) => {
-                            // Determine status based on metric type and value
-                            let status = { label: 'Normal', color: 'bg-green-500' };
-                            
-                            if (metric.type === 'blood_pressure') {
-                              const systolic = (metric.value as any).systolic;
-                              const diastolic = (metric.value as any).diastolic;
-                              
-                              if (systolic >= 140 || diastolic >= 90) {
-                                status = { label: 'High', color: 'bg-red-500' };
-                              } else if (systolic >= 130 || diastolic >= 85) {
-                                status = { label: 'Elevated', color: 'bg-yellow-500' };
-                              }
-                            } else if (metric.type === 'glucose') {
-                              const glucose = (metric.value as any).level;
-                              
-                              if (glucose >= 126) {
-                                status = { label: 'High', color: 'bg-red-500' };
-                              } else if (glucose >= 100) {
-                                status = { label: 'Elevated', color: 'bg-yellow-500' };
-                              }
-                            } else if (metric.type === 'heart_rate') {
-                              const hr = (metric.value as any).bpm;
-                              
-                              if (hr > 100) {
-                                status = { label: 'High', color: 'bg-red-500' };
-                              } else if (hr < 60) {
-                                status = { label: 'Low', color: 'bg-blue-500' };
-                              }
-                            }
-                            
-                            return (
-                              <tr key={idx} className="border-b last:border-0">
-                                <td className="py-3">
-                                  <div>
-                                    <p className="font-medium">{format(new Date(metric.recorded_at), 'MMM dd, yyyy')}</p>
-                                    <p className="text-sm text-muted-foreground">{format(new Date(metric.recorded_at), 'HH:mm')}</p>
+                    ) : metrics.length === 0 ? (
+                      <Card className="health-card border-dashed">
+                        <CardContent className="flex flex-col items-center justify-center py-10 text-center">
+                          <div className="rounded-full p-3 bg-muted mb-4">
+                            {getMetricCardIcon(activeTab)}
+                          </div>
+                          <CardTitle className="mb-2 text-lg">No {formatMetricType(activeTab)} Readings</CardTitle>
+                          <CardDescription className="mb-4">
+                            Start tracking your {activeTab.replace('_', ' ')} to see trends and insights.
+                          </CardDescription>
+                          <Button onClick={() => setShowAddForm(true)}>
+                            <Plus className="mr-2 h-4 w-4" /> Add First Reading
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                          <Card className="health-card">
+                            <CardHeader className="pb-2">
+                              <CardTitle className="text-lg font-medium">Latest Reading</CardTitle>
+                              <CardDescription>
+                                {format(new Date(metrics[0].recorded_at), 'PPP p')}
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              {(() => {
+                                const summary = getMetricSummary();
+                                if (!summary) return null;
+                                
+                                return (
+                                  <div className="space-y-4">
+                                    <div className="flex justify-between items-center">
+                                      <div>
+                                        <span className="text-3xl font-bold">{summary.value}</span>
+                                        <span className="text-muted-foreground ml-2">{summary.unit}</span>
+                                      </div>
+                                      <Badge className={summary.status.color}>
+                                        {summary.status.label}
+                                      </Badge>
+                                    </div>
+                                    <div className="space-y-1">
+                                      <div className="text-sm text-muted-foreground flex justify-between">
+                                        <span>Status</span>
+                                        <span>{summary.status.label}</span>
+                                      </div>
+                                      <Progress value={summary.progress} className="h-2" />
+                                    </div>
                                   </div>
-                                </td>
-                                <td className="py-3 font-medium">{getMetricValue(metric)}</td>
-                                <td className="py-3">
-                                  <div className="flex items-center">
-                                    <div className={`w-2 h-2 rounded-full ${status.color} mr-2`}></div>
-                                    <span className="text-sm">{status.label}</span>
+                                );
+                              })()}
+                            </CardContent>
+                          </Card>
+                          
+                          <Card className="health-card">
+                            <CardHeader className="pb-2">
+                              <CardTitle className="text-lg font-medium">Quick Stats</CardTitle>
+                              <CardDescription>
+                                Based on your last {metrics.length} readings
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-4">
+                                {activeTab === 'blood_pressure' ? (
+                                  <>
+                                    <div className="flex justify-between">
+                                      <div className="text-sm text-muted-foreground">Average Systolic</div>
+                                      <div className="font-medium">
+                                        {Math.round(metrics.reduce((sum, m) => sum + (m.value as any).systolic, 0) / metrics.length)} mmHg
+                                      </div>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <div className="text-sm text-muted-foreground">Average Diastolic</div>
+                                      <div className="font-medium">
+                                        {Math.round(metrics.reduce((sum, m) => sum + (m.value as any).diastolic, 0) / metrics.length)} mmHg
+                                      </div>
+                                    </div>
+                                  </>
+                                ) : activeTab === 'glucose' ? (
+                                  <div className="flex justify-between">
+                                    <div className="text-sm text-muted-foreground">Average Glucose</div>
+                                    <div className="font-medium">
+                                      {Math.round(metrics.reduce((sum, m) => sum + (m.value as any).level, 0) / metrics.length)} mg/dL
+                                    </div>
                                   </div>
-                                </td>
-                                <td className="py-3 text-sm text-muted-foreground">{metric.notes || '-'}</td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
+                                ) : activeTab === 'heart_rate' ? (
+                                  <div className="flex justify-between">
+                                    <div className="text-sm text-muted-foreground">Average Heart Rate</div>
+                                    <div className="font-medium">
+                                      {Math.round(metrics.reduce((sum, m) => sum + (m.value as any).bpm, 0) / metrics.length)} bpm
+                                    </div>
+                                  </div>
+                                ) : null}
+                                <div className="flex justify-between">
+                                  <div className="text-sm text-muted-foreground">Readings Taken</div>
+                                  <div className="font-medium">{metrics.length}</div>
+                                </div>
+                                <div className="flex justify-between">
+                                  <div className="text-sm text-muted-foreground">Last Updated</div>
+                                  <div className="font-medium">{format(new Date(metrics[0].recorded_at), 'PP')}</div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                        
+                        <Card className="health-card mb-6">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-lg font-medium">Trends</CardTitle>
+                            <CardDescription>
+                              Your {formatMetricType(activeTab)} over time
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            {renderChart()}
+                          </CardContent>
+                        </Card>
+                      </>
+                    )}
+                  </TabsContent>
+                </Tabs>
+              </div>
+              
+              <Card className="health-card">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg font-medium">Recent Entries</CardTitle>
+                  <CardDescription>Your latest health measurements</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {recentEntries.length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground">
+                      No recent entries found. Start tracking your health metrics.
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center py-8 text-center">
-                      <p className="text-muted-foreground mb-4">No {activeTab.replace('_', ' ')} metrics recorded</p>
-                      <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-                        <DialogTrigger asChild>
-                          <Button onClick={() => setShowAddForm(true)}>
-                            <Plus className="mr-2 h-4 w-4" /> Add Your First Reading
-                          </Button>
-                        </DialogTrigger>
-                      </Dialog>
-                </div>
+                    <ul className="space-y-3">
+                      {recentEntries.map((entry) => (
+                        <li key={entry.id} className="flex items-center p-2 rounded-md hover:bg-muted">
+                          <div className="rounded-full p-2 bg-muted mr-3">
+                            {getMetricCardIcon(entry.type)}
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium">{formatMetricType(entry.type)}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {format(new Date(entry.recorded_at), 'PPp')}
+                            </div>
+                          </div>
+                          <div className="font-semibold">{getMetricValue(entry)}</div>
+                        </li>
+                      ))}
+                    </ul>
                   )}
+                </CardContent>
+                <CardFooter className="pt-0">
+                  <Button variant="outline" className="w-full" onClick={() => setActiveView('history')}>
+                    <Clock className="mr-2 h-4 w-4" /> View All History
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
+          ) : (
+            <Card className="health-card">
+              <CardHeader>
+                <CardTitle>Measurement History</CardTitle>
+                <CardDescription>All your health measurements</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="all">
+                  <TabsList>
+                    <TabsTrigger value="all">All</TabsTrigger>
+                    <TabsTrigger value="blood_pressure">Blood Pressure</TabsTrigger>
+                    <TabsTrigger value="glucose">Glucose</TabsTrigger>
+                    <TabsTrigger value="heart_rate">Heart Rate</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="all" className="pt-4">
+                    <HistoryList metrics={recentEntries} getMetricCardIcon={getMetricCardIcon} getMetricValue={getMetricValue} formatMetricType={formatMetricType} />
+                  </TabsContent>
+                  <TabsContent value="blood_pressure" className="pt-4">
+                    <HistoryList metrics={bloodPressureMetrics} getMetricCardIcon={getMetricCardIcon} getMetricValue={getMetricValue} formatMetricType={formatMetricType} />
+                  </TabsContent>
+                  <TabsContent value="glucose" className="pt-4">
+                    <HistoryList metrics={glucoseMetrics} getMetricCardIcon={getMetricCardIcon} getMetricValue={getMetricValue} formatMetricType={formatMetricType} />
+                  </TabsContent>
+                  <TabsContent value="heart_rate" className="pt-4">
+                    <HistoryList metrics={heartRateMetrics} getMetricCardIcon={getMetricCardIcon} getMetricValue={getMetricValue} formatMetricType={formatMetricType} />
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
-            </div>
           )}
         </div>
       </div>
-    </div>
+    </PageLayout>
+  );
+};
+
+// Helper component for rendering history lists
+const HistoryList = ({ 
+  metrics, 
+  getMetricCardIcon, 
+  getMetricValue, 
+  formatMetricType 
+}: { 
+  metrics: HealthMetric[],
+  getMetricCardIcon: (type: MetricType) => React.ReactNode,
+  getMetricValue: (metric: HealthMetric) => string,
+  formatMetricType: (type: string) => string
+}) => {
+  if (metrics.length === 0) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        No entries found.
+      </div>
+    );
+  }
+  
+  return (
+    <ul className="space-y-3">
+      {metrics.map((entry) => (
+        <li key={entry.id} className="flex items-center p-3 rounded-md hover:bg-muted border border-border">
+          <div className="rounded-full p-2 bg-muted mr-3">
+            {getMetricCardIcon(entry.type)}
+          </div>
+          <div className="flex-1">
+            <div className="font-medium">{formatMetricType(entry.type)}</div>
+            <div className="text-sm text-muted-foreground">
+              {format(new Date(entry.recorded_at), 'PPp')}
+            </div>
+            {entry.notes && (
+              <div className="text-sm mt-1 text-muted-foreground">
+                Note: {entry.notes}
+              </div>
+            )}
+          </div>
+          <div className="font-semibold">{getMetricValue(entry)}</div>
+        </li>
+      ))}
+    </ul>
   );
 };
 

@@ -17,6 +17,8 @@ import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage";
 import ColorPalettePage from "./pages/ColorPalettePage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const queryClient = new QueryClient();
 
