@@ -36,13 +36,11 @@ const PageLayout: React.FC<PageLayoutProps> = ({
       
       <main className={`flex-grow flex flex-col ${withNavbar ? 'pt-16' : 'pt-0'} ${withSidebar ? 'md:pl-64' : ''}`}>
         <div className={`
-          h-full w-full max-h-[calc(100vh-80px)] 
+          w-full
           ${withPadding ? 'p-6' : ''} 
           ${className}
         `}>
-          <ScrollArea className="h-full w-full">
-            {children}
-          </ScrollArea>
+          {children}
         </div>
       </main>
 
