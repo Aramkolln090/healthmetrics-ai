@@ -56,7 +56,7 @@ export const SharedSidebar: React.FC<SidebarProps> = ({ children, items, classNa
   };
 
   return (
-    <div className={`hidden md:flex flex-col w-64 bg-sidebar border-r border-sidebar-border h-[calc(100vh-4rem)] fixed pt-6 ${className}`}>
+    <div className={`hidden md:flex flex-col w-64 bg-sidebar border-r border-sidebar-border h-screen fixed top-0 left-0 pt-16 ${className}`}>
       <div className="px-6 mb-6">
         <div className="flex items-center space-x-3">
           <Avatar>
